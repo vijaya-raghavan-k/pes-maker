@@ -3,170 +3,250 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>PES Maker — Potential Energy Surface Diagram Tool</title>
-<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<meta name="google-site-verification" content="phkhDkxNGv_IM7omxyKGsPlFw3SnFGq5MkLaCUG9AxI" />
+<title>PES Maker — Potential Energy Surface Diagram Maker</title>
+<meta name="description" content="PES Maker is a simple browser-based tool to draw and export potential energy surface diagrams for reaction pathways.">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="PES Maker, potential energy surface, reaction energy profile, computational chemistry, chemistry plotting tool, reaction pathway, energy diagram, DFT, transition state, activation energy, vijay, vijaya raghavan, phd, chemistry, mechanism">
+<link rel="canonical" href="https://vijaya-raghavan-k.github.io/pes-maker/">
+<script defer src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
 :root {
-  --bg: #f3f4f6;
+  --bg: #f8fafc;
   --surface: #ffffff;
-  --surface2: #f9fafb;
-  --text: #111827;
-  --text2: #4b5563;
-  --text3: #9ca3af;
-  --border: #e5e7eb;
-  --accent: #2563eb;
+  --surface2: #f1f5f9;
+  --surface3: #e2e8f0;
+  --text: #0f172a;
+  --text2: #475569;
+  --text3: #94a3b8;
+  --border: #e2e8f0;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
   --accent-light: #dbeafe;
-  --danger: #dc2626;
+  --accent-lighter: #eff6ff;
+  --danger: #ef4444;
   --danger-light: #fef2f2;
-  --good: #16a34a;
-  --good-light: #dcfce7;
+  --good: #10b981;
+  --good-light: #d1fae5;
+  --warning: #f59e0b;
+  --warning-light: #fef3c7;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
   --radius: 12px;
-  --input-radius: 8px;
-  --mono: 'JetBrains Mono', 'Consolas', monospace;
-  --sans: 'DM Sans', system-ui, sans-serif;
-  --header-bg: #111827;
-  --header-text: #f9fafb;
+  --radius-sm: 8px;
+  --radius-xs: 6px;
+  --mono: 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
+  --sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --header-bg: #1e293b;
+  --header-text: #f1f5f9;
   --tab-active: var(--accent);
   --tab-inactive: transparent;
   --input-bg: #ffffff;
-  --tag-bg: #f3f4f6;
+  --tag-bg: #f1f5f9;
 }
 [data-theme="dark"] {
-  --bg: #030712;
-  --surface: #111827;
-  --surface2: #1f2937;
-  --text: #f9fafb;
-  --text2: #9ca3af;
-  --text3: #6b7280;
-  --border: #374151;
-  --accent: #3b82f6;
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --surface2: #334155;
+  --surface3: #475569;
+  --text: #f1f5f9;
+  --text2: #cbd5e1;
+  --text3: #64748b;
+  --border: #334155;
+  --accent: #60a5fa;
+  --accent-hover: #3b82f6;
   --accent-light: #1e3a8a;
-  --danger: #ef4444;
+  --accent-lighter: #1e293b;
+  --danger: #f87171;
   --danger-light: #7f1d1d;
-  --good: #10b981;
+  --good: #34d399;
   --good-light: #064e3b;
+  --warning: #fbbf24;
+  --warning-light: #78350f;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
-  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-  --header-bg: #030712;
-  --header-text: #f9fafb;
-  --input-bg: #1f2937;
-  --tag-bg: #374151;
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.5), 0 1px 2px -1px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.5);
+  --header-bg: #020617;
+  --header-text: #f1f5f9;
+  --input-bg: #334155;
+  --tag-bg: #475569;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{font-size:14px}
-body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;display:flex;flex-direction:column}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;display:flex;flex-direction:column;line-height:1.5;-webkit-font-smoothing:antialiased}
 
 /* === HEADER === */
-.header{background:var(--header-bg);color:var(--header-text);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(255,255,255,.06)}
-.header-left{display:flex;align-items:center;gap:14px}
-.logo{width:36px;height:36px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:white;letter-spacing:-.5px;box-shadow:var(--shadow-sm)}
-.header h1{font-size:18px;font-weight:700;letter-spacing:-.3px}
-.header-right{display:flex;gap:8px;align-items:center}
-.theme-toggle{background:none;border:1px solid rgba(255,255,255,.15);border-radius:8px;color:var(--header-text);padding:6px 10px;cursor:pointer;font-size:15px;display:flex;align-items:center;transition:.2s}
-.theme-toggle:hover{background:rgba(255,255,255,.1)}
+.header{background:var(--header-bg);color:var(--header-text);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(255,255,255,.08);box-shadow:var(--shadow-md)}
+.header-left{display:flex;align-items:center;gap:16px}
+.logo{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:white;letter-spacing:-.5px;box-shadow:var(--shadow-md)}
+.header h1{font-size:19px;font-weight:600;letter-spacing:-.4px}
+.header-right{display:flex;gap:10px;align-items:center}
+.theme-toggle{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:var(--radius-sm);color:var(--header-text);padding:8px 12px;cursor:pointer;font-size:16px;display:flex;align-items:center;transition:all .2s ease;font-family:var(--sans);font-weight:500}
+.theme-toggle:hover{background:rgba(255,255,255,.15);transform:translateY(-1px)}
 
 /* === LAYOUT === */
-.app{display:grid;grid-template-columns:420px 1fr;gap:0;flex:1}
-.sidebar{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;height:calc(100vh - 65px);position:sticky;top:65px}
-.plot-area{padding:24px;display:flex;flex-direction:column;gap:16px;overflow:hidden;background:var(--bg)}
+.app{display:grid;grid-template-columns:440px 1fr;gap:0;flex:1;min-height:0}
+.sidebar{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;height:calc(100vh - 73px);position:sticky;top:73px;overflow:hidden}
+.plot-area{padding:28px;display:flex;flex-direction:column;gap:20px;overflow:auto;background:var(--bg)}
 
 /* === TABS === */
-.tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface);z-index:10;padding:0 8px;flex-shrink:0}
-.tab{flex:1;padding:14px 4px;text-align:center;font-size:11.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;cursor:pointer;border-bottom:3px solid transparent;color:var(--text2);transition:.2s;background:none;border-top:none;border-left:none;border-right:none}
-.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
-.tab:hover:not(.active){color:var(--text)}
-.tab-content{display:none;padding:20px;overflow-y:auto;flex:1}
+.tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface2);z-index:10;padding:0;flex-shrink:0}
+.tab{flex:1;padding:15px 8px;text-align:center;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;border-bottom:2px solid transparent;color:var(--text2);transition:all .2s ease;background:none;border-top:none;border-left:none;border-right:none;position:relative}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);background:var(--surface)}
+.tab:hover:not(.active){color:var(--text);background:rgba(0,0,0,.02)}
+[data-theme="dark"] .tab:hover:not(.active){background:rgba(255,255,255,.04)}
+.tab-content{display:none;padding:24px;overflow-y:auto;flex:1}
 .tab-content.active{display:block}
 
 /* === INPUTS === */
-label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text2);margin:16px 0 6px}
+label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--text2);margin:20px 0 8px}
 label:first-child{margin-top:0}
-textarea,input,select{width:100%;border:1px solid var(--border);border-radius:var(--input-radius);padding:10px 12px;font-size:13px;background:var(--input-bg);color:var(--text);font-family:var(--sans);transition:.2s;box-shadow:var(--shadow-sm)}
-textarea{font-family:var(--mono);font-size:12px;line-height:1.6;resize:vertical}
-textarea:focus,input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-light)}
-.data-area{min-height:260px}
-.color-area{min-height:72px}
+.label-optional{font-weight:400;text-transform:none;letter-spacing:0;color:var(--text3);margin-left:6px}
+textarea,input,select{width:100%;border:1px solid var(--border);border-radius:var(--radius-sm);padding:11px 14px;font-size:13.5px;background:var(--input-bg);color:var(--text);font-family:var(--sans);transition:all .2s ease;box-shadow:var(--shadow-sm)}
+textarea{font-family:var(--mono);font-size:12.5px;line-height:1.7;resize:vertical}
+textarea:focus,input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-lighter);background:var(--surface)}
+.data-area{min-height:280px}
+.color-area{min-height:80px}
 
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:end}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;align-items:end}
 
-.hint{font-size:12px;color:var(--text3);margin-top:8px;line-height:1.5;background:var(--surface2);padding:10px;border-radius:var(--input-radius);border:1px solid var(--border)}
-.hint code{font-family:var(--mono);font-size:11px;background:var(--tag-bg);padding:2px 4px;border-radius:4px;color:var(--text)}
+/* === HINTS & TIPS === */
+.hint{font-size:12px;color:var(--text2);margin-top:10px;line-height:1.6;background:var(--accent-lighter);padding:12px 14px;border-radius:var(--radius-sm);border:1px solid var(--accent-light);border-left:3px solid var(--accent)}
+.hint code{font-family:var(--mono);font-size:11.5px;background:var(--surface2);padding:2px 6px;border-radius:4px;color:var(--accent);font-weight:500}
+.hint strong{color:var(--text);font-weight:600}
+
+.tip{font-size:12px;color:var(--text2);margin-top:10px;line-height:1.6;background:var(--good-light);padding:12px 14px;border-radius:var(--radius-sm);border:1px solid var(--good);border-left:3px solid var(--good);display:flex;align-items:start;gap:10px}
+.tip-icon{font-size:16px;flex-shrink:0;margin-top:-1px}
+.tip strong{color:var(--text);font-weight:600}
+
+.warning{font-size:12px;color:var(--text);margin-top:10px;line-height:1.6;background:var(--warning-light);padding:12px 14px;border-radius:var(--radius-sm);border:1px solid var(--warning);border-left:3px solid var(--warning)}
 
 /* === BUTTONS === */
-.btn{border:none;border-radius:var(--input-radius);padding:10px 16px;font-weight:600;font-size:13px;cursor:pointer;font-family:var(--sans);transition:.2s;display:inline-flex;align-items:center;justify-content:center;gap:6px;letter-spacing:.2px;box-shadow:var(--shadow-sm)}
+.btn{border:none;border-radius:var(--radius-sm);padding:11px 18px;font-weight:600;font-size:13px;cursor:pointer;font-family:var(--sans);transition:all .2s ease;display:inline-flex;align-items:center;justify-content:center;gap:8px;letter-spacing:.2px;box-shadow:var(--shadow-sm)}
 .btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
 .btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{background:var(--accent-light);color:var(--accent)}
+.btn-primary:hover:not(:disabled){background:var(--accent-hover);box-shadow:var(--shadow-md);transform:translateY(-1px)}
 .btn-outline{background:var(--surface);border:1px solid var(--border);color:var(--text)}
-.btn-outline:hover{background:var(--surface2);border-color:var(--text3)}
+.btn-outline:hover:not(:disabled){background:var(--surface2);border-color:var(--text3)}
 .btn-good{background:var(--good);color:#fff}
-.btn-good:hover{filter:brightness(1.1)}
+.btn-good:hover:not(:disabled){filter:brightness(1.1);box-shadow:var(--shadow-md);transform:translateY(-1px)}
 .btn-danger{background:var(--surface);border:1px solid var(--danger);color:var(--danger)}
-.btn-danger:hover{background:var(--danger-light)}
-.btn-sm{padding:7px 12px;font-size:12px}
+.btn-danger:hover:not(:disabled){background:var(--danger-light);border-color:var(--danger)}
+.btn-sm{padding:8px 14px;font-size:12px}
 
-.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
-.action-full{grid-column:1/-1;padding:12px}
-.export-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px}
+.action-full{grid-column:1/-1;padding:13px;font-size:14px;font-weight:600}
+.export-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px}
 
 /* === STATS === */
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
-.stat-card{background:var(--surface2);border-radius:var(--input-radius);padding:12px 14px;border:1px solid var(--border);box-shadow:var(--shadow-sm)}
-.stat-label{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);font-weight:700}
-.stat-value{font-size:18px;font-weight:700;margin-top:4px;font-family:var(--mono)}
-.stat-sub{font-size:11px;color:var(--text2);margin-top:2px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px}
+.stat-card{background:var(--surface2);border-radius:var(--radius-sm);padding:14px 16px;border:1px solid var(--border);box-shadow:var(--shadow-sm);transition:all .2s ease}
+.stat-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.stat-label{font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);font-weight:600}
+.stat-value{font-size:20px;font-weight:700;margin-top:6px;font-family:var(--mono);color:var(--text)}
+.stat-sub{font-size:11.5px;color:var(--text2);margin-top:4px;font-family:var(--sans)}
 
 /* === TABLE === */
-.table-wrap{margin-top:20px;border:1px solid var(--border);border-radius:var(--input-radius);overflow:hidden;max-height:260px;overflow-y:auto;box-shadow:var(--shadow-sm)}
-table{width:100%;border-collapse:collapse;font-size:12px;background:var(--surface)}
-th{background:var(--surface2);font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--text2);font-weight:700;position:sticky;top:0;padding:10px}
-th,td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--border)}
+.table-wrap{margin-top:24px;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;max-height:280px;overflow-y:auto;box-shadow:var(--shadow-sm)}
+table{width:100%;border-collapse:collapse;font-size:12.5px;background:var(--surface)}
+th{background:var(--surface2);font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:var(--text2);font-weight:600;position:sticky;top:0;padding:12px;border-bottom:2px solid var(--border);z-index:1}
+th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--border)}
 th:first-child,td:first-child{text-align:left}
-td{font-family:var(--mono);font-size:12px}
+td{font-family:var(--mono);font-size:12.5px}
+tr:hover{background:var(--surface2)}
 tr:last-child td{border-bottom:none}
 
 /* === ANNOTATION PANEL === */
-.anno-item{display:flex;gap:8px;align-items:center;margin-bottom:8px;padding:8px;background:var(--surface2);border-radius:var(--input-radius);border:1px solid var(--border)}
-.anno-item input{flex:1;font-size:12px;padding:6px 10px;box-shadow:none}
+.anno-item{display:flex;gap:10px;align-items:center;margin-bottom:10px;padding:10px 12px;background:var(--surface2);border-radius:var(--radius-sm);border:1px solid var(--border);transition:all .2s ease}
+.anno-item:hover{box-shadow:var(--shadow);border-color:var(--accent-light)}
+.anno-item input{flex:1;font-size:12.5px;padding:8px 12px;box-shadow:none}
 .anno-item .btn{flex-shrink:0;box-shadow:none}
 
+.empty-state{font-size:12px;color:var(--text3);padding:16px;text-align:center;background:var(--surface2);border-radius:var(--radius-sm);border:1px dashed var(--border)}
+
 /* === HELP SECTION === */
-.help-section h3{font-size:14px;font-weight:700;margin:24px 0 10px;color:var(--accent)}
+.help-section h3{font-size:15px;font-weight:700;margin:28px 0 12px;color:var(--accent);letter-spacing:-.2px;display:flex;align-items:center;gap:8px}
 .help-section h3:first-child{margin-top:0}
-.help-section p{font-size:13px;line-height:1.6;color:var(--text);margin-bottom:10px}
-.help-section ul{margin-left:20px;margin-bottom:10px;font-size:13px;line-height:1.6;color:var(--text)}
-.help-section li{margin-bottom:6px}
-.help-section code{font-family:var(--mono);font-size:12px;background:var(--tag-bg);padding:2px 4px;border-radius:4px;color:var(--accent)}
+.help-section h3::before{content:'▸';font-size:12px;color:var(--accent)}
+.help-section p{font-size:13.5px;line-height:1.7;color:var(--text);margin-bottom:12px}
+.help-section ul{margin-left:24px;margin-bottom:14px;font-size:13.5px;line-height:1.7;color:var(--text)}
+.help-section li{margin-bottom:8px}
+.help-section code{font-family:var(--mono);font-size:12px;background:var(--tag-bg);padding:3px 6px;border-radius:4px;color:var(--accent);font-weight:500}
+.help-section strong{color:var(--text);font-weight:600}
+
+.example-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin:14px 0;font-family:var(--mono);font-size:12px;line-height:1.7;color:var(--text2);border-left:3px solid var(--accent)}
 
 /* === FOOTER === */
-.footer{text-align:center;padding:16px 20px;font-size:12px;color:var(--text3);border-top:1px solid var(--border);background:var(--surface);flex-shrink:0;line-height:1.6;font-weight:500;letter-spacing:.2px}
-.footer a {color: var(--accent); text-decoration: none; font-weight: 600;}
-.footer a:hover {text-decoration: underline;}
+.footer{text-align:center;padding:18px 24px;font-size:12.5px;color:var(--text3);border-top:1px solid var(--border);background:var(--surface);flex-shrink:0;line-height:1.7;font-weight:500;letter-spacing:.2px}
+.footer a{color:var(--accent);text-decoration:none;font-weight:600;transition:color .2s ease}
+.footer a:hover{color:var(--accent-hover);text-decoration:underline}
 
 /* === PLOT === */
-#plot{width:100%;flex:1;min-height:640px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+#plot{width:100%;flex:1;min-height:680px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-lg)}
 
 /* === TOAST === */
-.toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:var(--surface);padding:12px 20px;border-radius:var(--input-radius);font-size:13px;font-weight:600;opacity:0;transform:translateY(12px);transition:.3s;z-index:999;pointer-events:none;box-shadow:var(--shadow)}
-.toast.show{opacity:1;transform:translateY(0)}
+.toast{position:fixed;bottom:28px;right:28px;background:var(--text);color:var(--surface);padding:14px 24px;border-radius:var(--radius-sm);font-size:13.5px;font-weight:600;opacity:0;transform:translateY(16px);transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);z-index:999;pointer-events:none;box-shadow:var(--shadow-lg);max-width:320px}
+.toast.show{opacity:1;transform:translateY(0);pointer-events:auto}
 
 /* === PRESETS === */
-.preset-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.chip{padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;background:var(--tag-bg);color:var(--text2);cursor:pointer;border:1px solid transparent;transition:.2s}
-.chip:hover{border-color:var(--accent);color:var(--accent);background:var(--surface)}
+.preset-chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.chip{padding:8px 16px;border-radius:20px;font-size:11.5px;font-weight:600;background:var(--tag-bg);color:var(--text2);cursor:pointer;border:1px solid var(--border);transition:all .2s ease}
+.chip:hover{border-color:var(--accent);color:var(--accent);background:var(--surface);transform:translateY(-1px);box-shadow:var(--shadow)}
 .chip.active{background:var(--accent-light);color:var(--accent);border-color:var(--accent)}
+
+/* === SECTION HEADERS === */
+.section-header{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text2);margin:28px 0 14px;padding-bottom:8px;border-bottom:2px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.section-header:first-child{margin-top:0}
 
 /* === RESPONSIVE === */
 @media(max-width:1024px){
   .app{grid-template-columns:1fr;grid-template-rows:auto 1fr;height:auto}
   .sidebar{height:auto;position:static;border-right:none;border-bottom:1px solid var(--border)}
-  #plot{min-height:480px}
+  #plot{min-height:520px}
+  .header{padding:14px 20px}
+  .plot-area{padding:20px}
 }
+
+/* === SCROLLBAR === */
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:var(--surface2)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:5px}
+::-webkit-scrollbar-thumb:hover{background:var(--text3)}
+
+/* === FOCUS VISIBLE === */
+*:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* === HOVER TOOLTIPS === */
+.has-tooltip{position:relative}
+.tooltip-text{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--text);color:var(--surface);padding:8px 12px;border-radius:var(--radius-xs);font-size:12px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s ease;z-index:1000;box-shadow:var(--shadow-lg);max-width:280px;white-space:normal;text-align:center;line-height:1.4}
+.has-tooltip:hover .tooltip-text{opacity:0}
+.has-tooltip.show-tooltip .tooltip-text{opacity:1}
+.tooltip-text::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--text)}
+
+/* === PREVIEW MODAL === */
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);display:none;align-items:center;justify-content:center;z-index:9999;padding:20px;backdrop-filter:blur(4px)}
+.modal-overlay.show{display:flex}
+.modal-content{background:var(--surface);border-radius:var(--radius);max-width:95vw;max-height:95vh;overflow:hidden;box-shadow:var(--shadow-lg);display:flex;flex-direction:column}
+.modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.modal-header h3{font-size:16px;font-weight:600;color:var(--text);margin:0}
+.modal-close{background:none;border:none;font-size:24px;color:var(--text3);cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-xs);transition:all .2s}
+.modal-close:hover{background:var(--surface2);color:var(--text)}
+.modal-body{padding:24px;overflow:auto;flex:1;min-height:0}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:12px;justify-content:flex-end;flex-shrink:0}
+.preview-container{border:1px solid var(--border);border-radius:var(--radius-sm);overflow:auto;background:var(--bg);display:flex;align-items:flex-start;justify-content:flex-start;min-height:400px;max-height:calc(95vh - 300px)}
+.preview-info{background:var(--surface2);padding:12px 16px;border-radius:var(--radius-sm);margin-bottom:16px;font-size:12.5px;color:var(--text2);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.preview-info strong{color:var(--text);font-weight:600}
+
+/* === RECOMMENDED TAG === */
+.btn-recommended{position:relative}
+.btn-recommended::after{content:'Recommended';position:absolute;top:-8px;right:-8px;background:var(--good);color:white;font-size:9px;padding:2px 6px;border-radius:10px;font-weight:700;letter-spacing:.3px;box-shadow:var(--shadow-sm)}
 </style>
 </head>
 <body>
@@ -177,7 +257,7 @@ tr:last-child td{border-bottom:none}
     <h1>PES Maker</h1>
   </div>
   <div class="header-right">
-    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode">◐</button>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode" aria-label="Toggle theme">◐</button>
   </div>
 </div>
 
@@ -195,7 +275,7 @@ tr:last-child td{border-bottom:none}
     <!-- DATA TAB -->
     <div class="tab-content active" id="tab-data">
       <label>Pathway data</label>
-      <textarea id="dataInput" class="data-area" spellcheck="false"># Exceptional case: Curve crossing and shifted labels
+      <textarea id="dataInput" class="data-area" spellcheck="false" placeholder="Enter your PES data here..."># Exceptional case: Curve crossing and shifted labels
 Path1, 1, Reactant, 0.00
 Path1, 2, TS1, 25.00, 12@-0.2
 Path1, 3, Intermediate, 10.00
@@ -208,68 +288,132 @@ Path2, 3, Intermediate*, 15.00, #E
 Path2, 4, TS2*, 45.00, @0.2
 Path2, 5, Product*, 5.00</textarea>
       
-      <div class="hint">Columns: pathway, step, label, energy, [options].<br>
-      Options (5th col): <code>#L</code> (hide label), <code>#E</code> (hide energy).<br>
-      Use <code>Y@X</code> to shift labels (e.g. <code>9</code> for vertical up, <code>9@3</code> for vertical up & horizontal right, <code>@-0.2</code> for horizontal left only).</div>
+      <div class="hint">
+        <strong>Data format:</strong> <code>pathway, step, label, energy, [options]</code><br>
+        <strong>Options (5th column):</strong> <code>#L</code> hide label · <code>#E</code> hide energy<br>
+        <strong>Label positioning:</strong> <code>Y@X</code> format — e.g., <code>9</code> (up), <code>9@0.3</code> (up + right), <code>@-0.2</code> (left only)
+      </div>
 
-      <label>Quick-load presets</label>
+      <label>Quick-load example datasets</label>
       <div class="preset-chips">
-        <span class="chip" onclick="loadPreset('sn2')">S<sub>N</sub>2</span>
-        <span class="chip" onclick="loadPreset('multi')">Multi-path</span>
-        <span class="chip" onclick="loadPreset('catalytic')">Catalytic cycle</span>
+        <span class="chip" onclick="loadPreset('sn2')">S<sub>N</sub>2 Reaction</span>
+        <span class="chip" onclick="loadPreset('multi')">Multi-pathway</span>
+        <span class="chip" onclick="loadPreset('catalytic')">Catalytic Cycle</span>
         <span class="chip" onclick="loadPreset('degradation')">Degradation</span>
       </div>
 
-      <div class="row" style="margin-top:16px">
-        <div><label>Energy treatment</label>
-          <select id="energyMode"><option value="raw">As given</option><option value="relative">Shift min → 0</option></select>
+      <div class="row" style="margin-top:20px">
+        <div>
+          <label>Energy treatment</label>
+          <select id="energyMode" data-tooltip="Choose whether to use raw energy values or shift the minimum to zero">
+            <option value="raw">As given</option>
+            <option value="relative">Shift min → 0</option>
+          </select>
         </div>
-        <div><label>Step alignment</label>
-          <select id="stepAlign"><option value="vertical">Aligned</option><option value="offset">Offset pathways</option></select>
+        <div>
+          <label>Step alignment</label>
+          <select id="stepAlign" data-tooltip="Align pathways vertically at same steps or offset them horizontally for clarity">
+            <option value="vertical">Aligned</option>
+            <option value="offset">Offset pathways</option>
+          </select>
         </div>
       </div>
 
       <div class="action-grid">
-        <button class="btn btn-primary action-full" onclick="drawPlot()">⟶ &nbsp;Draw diagram</button>
+        <button class="btn btn-primary action-full" onclick="drawPlot()">
+          <span style="font-size:16px">⟶</span> Draw Diagram
+        </button>
       </div>
 
       <!-- Stats -->
       <div class="stats" id="statsArea" style="display:none">
-        <div class="stat-card"><div class="stat-label">Pathways</div><div class="stat-value" id="statPaths">—</div></div>
-        <div class="stat-card"><div class="stat-label">Points</div><div class="stat-value" id="statPts">—</div></div>
-        <div class="stat-card"><div class="stat-label">Global min</div><div class="stat-value" id="statMin">—</div><div class="stat-sub" id="statMinLabel"></div></div>
-        <div class="stat-card"><div class="stat-label">Global max</div><div class="stat-value" id="statMax">—</div><div class="stat-sub" id="statMaxLabel"></div></div>
+        <div class="stat-card">
+          <div class="stat-label">Pathways</div>
+          <div class="stat-value" id="statPaths">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Points</div>
+          <div class="stat-value" id="statPts">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Global min</div>
+          <div class="stat-value" id="statMin">—</div>
+          <div class="stat-sub" id="statMinLabel"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Global max</div>
+          <div class="stat-value" id="statMax">—</div>
+          <div class="stat-sub" id="statMaxLabel"></div>
+        </div>
       </div>
 
-      <div class="table-wrap" id="tableWrap" style="display:none"><table id="pointTable"></table></div>
+      <div class="table-wrap" id="tableWrap" style="display:none">
+        <table id="pointTable"></table>
+      </div>
     </div>
 
     <!-- STYLE TAB -->
     <div class="tab-content" id="tab-style">
+      <div class="section-header">Plot Labels</div>
+      
       <div class="row">
-        <div><label>Plot title</label><input id="plotTitle" value="Potential Energy Surface Diagram"></div>
-        <div><label>Diagram style</label>
-          <select id="diagramStyle"><option value="levels">Energy levels</option><option value="points">Point-to-point</option></select>
+        <div>
+          <label>Plot title</label>
+          <input id="plotTitle" value="Potential Energy Surface Diagram" placeholder="Enter plot title">
+        </div>
+        <div>
+          <label>Diagram style</label>
+          <select id="diagramStyle" data-tooltip="Energy levels: horizontal bars connected by lines. Point-to-point: markers connected directly">
+            <option value="levels">Energy levels</option>
+            <option value="points">Point-to-point</option>
+          </select>
         </div>
       </div>
+      
       <div class="row">
-        <div><label>X-axis label</label><input id="xLabel" value="Reaction coordinate"></div>
-        <div><label>Y-axis label</label><input id="yLabel" value="Relative energy (kcal mol⁻¹)"></div>
+        <div>
+          <label>X-axis label</label>
+          <input id="xLabel" value="Reaction coordinate" placeholder="e.g., Reaction coordinate">
+        </div>
+        <div>
+          <label>Y-axis label</label>
+          <input id="yLabel" value="Relative energy (kcal mol⁻¹)" placeholder="e.g., Energy (kcal/mol)">
+        </div>
       </div>
+
+      <div class="section-header">Axis Configuration</div>
+      
       <div class="row">
-        <div><label>X-axis visibility</label>
-          <select id="xAxisChoice"><option value="show">Visible</option><option value="hide">Hidden</option></select>
+        <div>
+          <label>X-axis visibility</label>
+          <select id="xAxisChoice">
+            <option value="show">Visible</option>
+            <option value="hide">Hidden</option>
+          </select>
         </div>
-        <div><label>Y-axis visibility</label>
-          <select id="yAxisChoice"><option value="show">Visible</option><option value="hide">Hidden</option></select>
+        <div>
+          <label>Y-axis visibility</label>
+          <select id="yAxisChoice">
+            <option value="show">Visible</option>
+            <option value="hide">Hidden</option>
+          </select>
         </div>
       </div>
+
+      <div class="section-header">Connectors & Lines</div>
+      
       <div class="row">
-        <div><label>Connector style</label>
-          <select id="lineShape"><option value="spline">Smooth curve</option><option value="linear">Straight</option><option value="hv">Step-like</option></select>
+        <div>
+          <label>Connector style</label>
+          <select id="lineShape" data-tooltip="Smooth curve: elegant spline. Straight: direct lines. Step-like: right-angle transitions">
+            <option value="spline">Smooth curve</option>
+            <option value="linear">Straight</option>
+            <option value="hv">Step-like</option>
+          </select>
         </div>
-        <div><label>Connector pattern</label>
-          <select id="connectorDash">
+        <div>
+          <label>Connector pattern</label>
+          <select id="connectorDash" data-tooltip="Auto uses solid for first pathway, dotted for others. Override with all solid/dashed/dotted">
             <option value="auto">Auto (Solid/Dot)</option>
             <option value="solid">All Solid</option>
             <option value="dash">All Dashed</option>
@@ -278,50 +422,81 @@ Path2, 5, Product*, 5.00</textarea>
           </select>
         </div>
       </div>
+      
       <div class="row">
-        <div><label>Plot bounding box</label>
-          <select id="boxBorderChoice"><option value="hide">Off</option><option value="show">On</option></select>
-        </div>
-        <div><label>Legend box border</label>
-          <select id="legendBorderChoice"><option value="hide">Off</option><option value="show">On</option></select>
-        </div>
-      </div>
-      <div class="row">
-        <div><label>Background grid</label>
-          <select id="gridChoice"><option value="light">Light grid</option><option value="off">No grid</option><option value="full">Full grid</option></select>
-        </div>
-        <div><label>Zero line</label>
-          <select id="zeroLineChoice"><option value="show">Show</option><option value="hide">Hide</option></select>
-        </div>
-      </div>
-      <div class="row">
-        <div><label>Level markers</label>
-          <select id="showMarkersChoice"><option value="hide">Hidden</option><option value="show">Visible</option></select>
-        </div>
-        <div><label>Species labels</label>
-          <select id="labelChoice"><option value="all">Label + energy</option><option value="name">Label only</option><option value="energy">Energy only</option><option value="none">None</option></select>
-        </div>
-      </div>
-      <div class="row">
-        <div><label>Level bar width</label>
-          <input id="levelWidth" type="number" min="0.1" max="0.9" step="0.05" value="0.45">
-        </div>
-        <div><label>Connector width</label>
+        <div>
+          <label>Connector width</label>
           <input id="connectorWidth" type="number" min="0.5" max="5" step="0.5" value="1.5">
         </div>
-      </div>
-      <div class="row">
-        <div><label>Level bar thickness</label>
+        <div>
+          <label>Level bar thickness</label>
           <input id="levelThickness" type="number" min="1" max="8" step="0.5" value="3">
         </div>
-        <div><label>Label font size</label>
-          <input id="labelFontSize" type="number" min="8" max="18" step="1" value="11">
+      </div>
+
+      <div class="section-header">Visual Elements</div>
+      
+      <div class="row">
+        <div>
+          <label>Plot bounding box</label>
+          <select id="boxBorderChoice">
+            <option value="hide">Off</option>
+            <option value="show">On</option>
+          </select>
+        </div>
+        <div>
+          <label>Legend box border</label>
+          <select id="legendBorderChoice">
+            <option value="hide">Off</option>
+            <option value="show">On</option>
+          </select>
         </div>
       </div>
+      
       <div class="row">
-        <div><label>Font family</label>
+        <div>
+          <label>Background grid</label>
+          <select id="gridChoice">
+            <option value="light">Light grid</option>
+            <option value="off">No grid</option>
+            <option value="full">Full grid</option>
+          </select>
+        </div>
+        <div>
+          <label>Zero line</label>
+          <select id="zeroLineChoice">
+            <option value="show">Show</option>
+            <option value="hide">Hide</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div>
+          <label>Level markers</label>
+          <select id="showMarkersChoice">
+            <option value="hide">Hidden</option>
+            <option value="show">Visible</option>
+          </select>
+        </div>
+        <div>
+          <label>Species labels</label>
+          <select id="labelChoice">
+            <option value="all">Label + energy</option>
+            <option value="name">Label only</option>
+            <option value="energy">Energy only</option>
+            <option value="none">None</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="section-header">Typography & Sizing</div>
+      
+      <div class="row">
+        <div>
+          <label>Font family</label>
           <select id="fontFamily">
-            <option value="DM Sans">DM Sans</option>
+            <option value="Inter">Inter</option>
             <option value="Arial">Arial</option>
             <option value="Helvetica">Helvetica</option>
             <option value="Times New Roman">Times New Roman</option>
@@ -333,15 +508,30 @@ Path2, 5, Product*, 5.00</textarea>
             <option value="Verdana">Verdana</option>
           </select>
         </div>
-        <div><label>Title font size</label>
+        <div>
+          <label>Title font size</label>
           <input id="titleFontSize" type="number" min="10" max="30" step="1" value="18">
         </div>
       </div>
+      
       <div class="row">
-        <div><label>Axis font size</label>
+        <div>
+          <label>Label font size</label>
+          <input id="labelFontSize" type="number" min="8" max="18" step="1" value="11">
+        </div>
+        <div>
+          <label>Axis font size</label>
           <input id="axisFontSize" type="number" min="8" max="20" step="1" value="13">
         </div>
-        <div><label>Legend position</label>
+      </div>
+      
+      <div class="row">
+        <div>
+          <label>Level bar width</label>
+          <input id="levelWidth" type="number" min="0.1" max="0.9" step="0.05" value="0.45">
+        </div>
+        <div>
+          <label>Legend position</label>
           <select id="legendPosition">
             <option value="bottom-h">Bottom (horizontal)</option>
             <option value="bottom-v">Bottom (vertical)</option>
@@ -354,12 +544,20 @@ Path2, 5, Product*, 5.00</textarea>
           </select>
         </div>
       </div>
+
+      <div class="section-header">Color Scheme</div>
+      
       <div class="row">
-        <div><label>Pathway colors</label>
-          <select id="colorMode"><option value="auto">Automatic</option><option value="custom">Custom</option></select>
+        <div>
+          <label>Pathway colors</label>
+          <select id="colorMode" data-tooltip="Automatic: use selected palette. Custom: define your own hex colors below">
+            <option value="auto">Automatic</option>
+            <option value="custom">Custom</option>
+          </select>
         </div>
-        <div><label>Color palette</label>
-          <select id="paletteChoice">
+        <div>
+          <label>Color palette</label>
+          <select id="paletteChoice" data-tooltip="Choose a color scheme for pathways. Default: professional contrast colors">
             <option value="default">Default</option>
             <option value="muted">Muted earth</option>
             <option value="vivid">Vivid</option>
@@ -368,33 +566,48 @@ Path2, 5, Product*, 5.00</textarea>
           </select>
         </div>
       </div>
-      <label>Custom colors <span style="font-weight:400;text-transform:none;letter-spacing:0">(pathway, #hex)</span></label>
-      <textarea id="colorInput" class="color-area" spellcheck="false">Path1, #1a1a1a
+      
+      <label>Custom colors <span class="label-optional">(pathway, #hex)</span></label>
+      <textarea id="colorInput" class="color-area" spellcheck="false" placeholder="Path1, #1a1a1a&#10;Path2, #b91c1c">Path1, #1a1a1a
 Path2, #b91c1c</textarea>
 
       <div class="action-grid">
-        <button class="btn btn-primary action-full" onclick="drawPlot()">⟶ &nbsp;Redraw</button>
+        <button class="btn btn-primary action-full" onclick="drawPlot()">
+          <span style="font-size:16px">⟲</span> Redraw Diagram
+        </button>
       </div>
     </div>
 
     <!-- ANNOTATE TAB -->
     <div class="tab-content" id="tab-annotate">
-      <label>Custom annotations</label>
-      <div class="hint" style="margin-top:0;margin-bottom:12px">Add free-floating text labels or arrows anywhere on the diagram. Coordinates match the plot axes.</div>
+      <div class="section-header">Custom Annotations</div>
+      
+      <div class="hint" style="margin-top:0">
+        Add free-floating text labels or arrows anywhere on the diagram. Coordinates match the plot axes directly.
+      </div>
+      
       <div id="annoList"></div>
-      <button class="btn btn-outline btn-sm" onclick="addAnnotation()" style="margin-top:8px">+ Add annotation</button>
+      <button class="btn btn-outline btn-sm" onclick="addAnnotation()" style="margin-top:12px">+ Add Annotation</button>
 
-      <label style="margin-top:24px">Barrier markers</label>
-      <div class="hint" style="margin-top:0;margin-bottom:12px">Draw vertical energy difference arrows between two steps. Use X-Offset to manually nudge the line left or right (e.g. <code>0.2</code>).</div>
+      <div class="section-header">Barrier Energy Markers</div>
+      
+      <div class="hint" style="margin-top:0">
+        Draw vertical energy difference arrows between two steps on the same pathway. The value is automatically calculated as (Final − Initial).
+      </div>
+      
       <div id="barrierList"></div>
-      <div class="row" style="margin-top:10px">
-        <div><input id="barrierPath" value="Path1" placeholder="Pathway"></div>
-        <div style="display:flex;gap:6px">
+      
+      <div class="row" style="margin-top:16px">
+        <div>
+          <input id="barrierPath" value="Path1" placeholder="Pathway name">
+        </div>
+        <div style="display:flex;gap:8px">
           <input id="barrierFrom" type="number" value="1" min="1" placeholder="From" title="From step">
           <input id="barrierTo" type="number" value="2" min="1" placeholder="To" title="To step">
         </div>
       </div>
-      <div class="row" style="margin-top:10px">
+      
+      <div class="row" style="margin-top:12px">
         <div>
           <select id="barrierStyle">
             <option value="dash">Dashed</option>
@@ -415,7 +628,8 @@ Path2, #b91c1c</textarea>
           </select>
         </div>
       </div>
-      <div class="row3" style="margin-top:10px">
+      
+      <div class="row3" style="margin-top:12px">
         <div>
           <input id="barrierCustomText" placeholder="Custom text..." disabled style="opacity:0.5; width:100%">
         </div>
@@ -426,102 +640,150 @@ Path2, #b91c1c</textarea>
           </select>
         </div>
         <div>
-          <input id="barrierOffsetX" type="number" step="0.1" value="0" placeholder="X-Offset" title="X-axis manual nudge (e.g., 0.2 or -0.2)" style="width:100%">
+          <input id="barrierOffsetX" type="number" step="0.1" value="0" placeholder="X-Offset" title="Horizontal nudge (e.g., 0.2 or -0.2)" style="width:100%">
         </div>
       </div>
-      <div style="margin-top:10px">
-        <button class="btn btn-outline btn-sm" style="width:100%" onclick="addBarrierMarker()">+ Add barrier</button>
+      
+      <div style="margin-top:12px">
+        <button class="btn btn-outline btn-sm" style="width:100%" onclick="addBarrierMarker()">+ Add Barrier</button>
       </div>
 
-      <div class="action-grid" style="margin-top:20px">
-        <button class="btn btn-primary action-full" onclick="drawPlot()">⟶ &nbsp;Redraw with annotations</button>
+      <div class="action-grid">
+        <button class="btn btn-primary action-full" onclick="drawPlot()">
+          <span style="font-size:16px">⟲</span> Redraw with Annotations
+        </button>
       </div>
     </div>
 
     <!-- SCRIPT TAB -->
     <div class="tab-content" id="tab-script">
-      <label>PES Runscript</label>
-      <div class="hint" style="margin-top:0;margin-bottom:12px">Text configuration that captures all settings, data, annotations, and barriers. Generate from current state, edit directly, or paste a saved script to restore.</div>
-      <textarea id="scriptEditor" spellcheck="false" style="min-height:380px;font-family:var(--mono);font-size:11.5px;line-height:1.5;tab-size:2"></textarea>
-      <div class="action-grid" style="margin-top:12px">
-        <button class="btn btn-primary" onclick="generateScript()">⤓ Generate script</button>
-        <button class="btn btn-good" onclick="loadScript()">⤒ Load script</button>
-        <button class="btn btn-outline" onclick="copyScript()">Copy to clipboard</button>
-        <button class="btn btn-outline" onclick="clearScript()">Clear editor</button>
+      <div class="section-header">PES Runscript</div>
+      
+      <div class="hint" style="margin-top:0">
+        <strong>Complete configuration file</strong> that captures all settings, data, annotations, and barriers. Generate from current state, edit directly, or paste a saved script to restore your work.
+      </div>
+      
+      <textarea id="scriptEditor" spellcheck="false" style="min-height:400px;font-family:var(--mono);font-size:12px;line-height:1.6;tab-size:2" placeholder="Generate or paste a PES runscript here..."></textarea>
+      
+      <div class="action-grid" style="margin-top:16px">
+        <button class="btn btn-primary" onclick="generateScript()">
+          <span style="font-size:14px">⤓</span> Generate Script
+        </button>
+        <button class="btn btn-good" onclick="loadScript()">
+          <span style="font-size:14px">⤒</span> Load Script
+        </button>
+        <button class="btn btn-outline" onclick="copyScript()">Copy to Clipboard</button>
+        <button class="btn btn-outline" onclick="clearScript()">Clear Editor</button>
       </div>
     </div>
 
     <!-- EXPORT TAB -->
     <div class="tab-content" id="tab-export">
-      <label>Image export</label>
-      <div class="hint" style="margin-top:0;margin-bottom:12px">High-resolution exports at 2× scale. PDF uses landscape A4 format.</div>
+      <div class="section-header">Image Export Settings</div>
+      
       <div class="row">
-        <div><label>Width (px)</label><input id="exportW" type="number" value="1500"></div>
-        <div><label>Height (px)</label><input id="exportH" type="number" value="950"></div>
+        <div>
+          <label>Width (px)</label>
+          <input id="exportW" type="number" value="1500" min="400" max="4000" step="100" data-tooltip="Image width in pixels. Higher values = larger file size but better quality">
+        </div>
+        <div>
+          <label>Height (px)</label>
+          <input id="exportH" type="number" value="950" min="300" max="3000" step="50" data-tooltip="Image height in pixels. Adjust to match your aspect ratio needs">
+        </div>
       </div>
-      <div class="row" style="margin-top:10px">
-        <div><label>Scale factor</label><input id="exportScale" type="number" min="1" max="4" step="1" value="2"></div>
-        <div><label>Background</label>
-          <select id="exportBg"><option value="white">White</option><option value="transparent">Transparent</option></select>
+      
+      <div class="row" style="margin-top:12px">
+        <div>
+          <label>Scale factor</label>
+          <input id="exportScale" type="number" min="1" max="4" step="1" value="2" data-tooltip="Multiplier for resolution. 2× = crisp prints. 1× = screen only">
+        </div>
+        <div>
+          <label>Background</label>
+          <select id="exportBg" data-tooltip="White: standard. Transparent: for overlaying on other backgrounds">
+            <option value="white">White</option>
+            <option value="transparent">Transparent</option>
+          </select>
         </div>
       </div>
 
       <div class="export-grid">
-        <button class="btn btn-good" onclick="downloadImage('png')">PNG</button>
-        <button class="btn btn-good" onclick="downloadImage('svg')">SVG</button>
-        <button class="btn btn-good" onclick="downloadPDF()">PDF</button>
-        <button class="btn btn-outline" onclick="downloadCSV()">CSV</button>
+        <button class="btn btn-good btn-recommended" onclick="downloadImage('svg')" title="Vector format - scales perfectly at any size">SVG</button>
+        <button class="btn btn-good" onclick="downloadImage('png')" title="Raster format - widely compatible">PNG</button>
+        <button class="btn btn-good" onclick="downloadPDF()" title="Document format - ready for papers">PDF</button>
+        <button class="btn btn-outline" onclick="downloadCSV()" title="Export raw data as CSV">CSV</button>
       </div>
 
-      <label style="margin-top:24px">Data management</label>
+      <div class="section-header">Data Management</div>
+      
       <div class="action-grid">
-        <button class="btn btn-outline" onclick="copyData()">Copy data to clipboard</button>
-        <button class="btn btn-danger" onclick="clearData()">Clear all</button>
+        <button class="btn btn-outline" onclick="copyData()">
+          Copy Data to Clipboard
+        </button>
+        <button class="btn btn-danger" onclick="clearData()">
+          Clear All Data
+        </button>
       </div>
     </div>
 
     <!-- HELP TAB -->
     <div class="tab-content help-section" id="tab-help">
       <h3>Data Formatting</h3>
-      <p>Data must be entered as comma, tab, or semicolon separated values using the following column order:<br>
-      <code>Pathway, Step, Label, Energy, [Options]</code></p>
+      <p>Data must be entered as comma, tab, or semicolon separated values using the following column order:</p>
+      <div class="example-box">Pathway, Step, Label, Energy, [Options]</div>
+      
       <ul>
         <li><strong>Pathway:</strong> Name of the reaction path (e.g., <code>Main</code> or <code>Alt-A</code>). Points sharing the same pathway name will be connected by lines.</li>
         <li><strong>Step:</strong> Integer representing the horizontal reaction coordinate (e.g., 1, 2, 3). Shared step numbers across different pathways will align vertically.</li>
-        <li><strong>Label:</strong> The text to display for the species.</li>
-        <li><strong>Energy:</strong> The numerical energy value (e.g., <code>32.4</code> or <code>-5.2</code>).</li>
+        <li><strong>Label:</strong> The text to display for the species (supports subscripts and superscripts).</li>
+        <li><strong>Energy:</strong> The numerical energy value in your chosen units (e.g., <code>32.4</code> or <code>-5.2</code>).</li>
       </ul>
 
       <h3>The 5th Column [Options]</h3>
       <p>You can add an optional 5th column to precisely control how labels and numbers are displayed for individual points.</p>
       <ul>
-        <li><code>#L</code> : Hides the text label.</li>
-        <li><code>#E</code> : Hides the numerical energy value.</li>
-        <li><strong>Number@Number</strong> : Adjusts vertical and horizontal positions of labels independently. 
-            Format is <code>Y@X</code> where <code>Y</code> shifts vertical energy amount and <code>X</code> shifts horizontal steps. 
-            <ul>
-                <li><code>10</code> : Shifts label UP by 10 energy units.</li>
-                <li><code>10@0.2</code> : Shifts label UP by 10 units AND RIGHT by 0.2 steps.</li>
-                <li><code>@-0.3</code> : Shifts label LEFT by 0.3 steps (no vertical shift).</li>
-            </ul>
+        <li><code>#L</code> — Hides the text label for this point</li>
+        <li><code>#E</code> — Hides the numerical energy value for this point</li>
+        <li><strong>Position shifting (Y@X format):</strong> Adjusts vertical and horizontal positions of labels independently
+          <ul>
+            <li><code>10</code> — Shifts label UP by 10 energy units</li>
+            <li><code>10@0.2</code> — Shifts label UP by 10 units AND RIGHT by 0.2 steps</li>
+            <li><code>@-0.3</code> — Shifts label LEFT by 0.3 steps (no vertical shift)</li>
+          </ul>
         </li>
       </ul>
-      <div class="hint" style="margin-top:0">Example: <code>Path1, 3, INT1, -5.20, #E 10@0.2</code><br>This hides the energy number and shifts the "INT1" label UP and slightly RIGHT.</div>
+      
+      <div class="example-box">Path1, 3, INT1, -5.20, #E 10@0.2</div>
+      <p style="margin-top:8px;font-size:12.5px;color:var(--text2)">This example hides the energy number and shifts the "INT1" label UP and slightly RIGHT.</p>
 
-      <h3 style="margin-top:24px">Subscripts & Superscripts</h3>
-      <p>You can easily format chemical formulas or transition state symbols in both the Data Tab and Custom Annotations Tab:</p>
+      <h3>Subscripts & Superscripts</h3>
+      <p>Format chemical formulas and transition state symbols in both the Data Tab and Custom Annotations Tab:</p>
       <ul>
-        <li><strong>Subscripts:</strong> Wrap text in <code>_{...}</code>. Example: <code>H_{2}O</code> renders as H<sub>2</sub>O.</li>
-        <li><strong>Superscripts:</strong> Wrap text in <code>^{...}</code>. Example: <code>E^{‡}</code> renders as E<sup>‡</sup>.</li>
+        <li><strong>Subscripts:</strong> Wrap text in <code>_{...}</code><br>
+          Example: <code>H_{2}O</code> renders as H<sub>2</sub>O</li>
+        <li><strong>Superscripts:</strong> Wrap text in <code>^{...}</code><br>
+          Example: <code>E^{‡}</code> renders as E<sup>‡</sup></li>
       </ul>
 
-      <h3 style="margin-top:24px">Barriers & Annotations</h3>
-      <p><strong>Barrier Markers</strong> calculate the exact energy difference (Final minus Initial) between two steps on the same pathway. If you need to stop overlapping elements, use the <strong>X-Offset</strong> input to manually nudge the barrier left (e.g., <code>-0.2</code>) or right (e.g., <code>0.2</code>).</p>
-      <p><strong>Custom Annotations</strong> allow you to place free-floating text or arrows anywhere on the canvas using X and Y coordinates that map directly to the plot axes.</p>
+      <h3>Barrier Markers</h3>
+      <p><strong>Barrier Markers</strong> automatically calculate the exact energy difference (Final − Initial) between two steps on the same pathway. If overlapping elements occur, use the <strong>X-Offset</strong> input to manually nudge the barrier left (e.g., <code>-0.2</code>) or right (e.g., <code>0.2</code>).</p>
+
+      <h3>Custom Annotations</h3>
+      <p><strong>Custom Annotations</strong> allow you to place free-floating text or arrows anywhere on the canvas. X and Y coordinates map directly to the plot axes, making precise positioning straightforward.</p>
+
+      <h3>Keyboard Shortcuts</h3>
+      <ul>
+        <li><code>Ctrl/Cmd + Enter</code> — Redraw diagram from any tab</li>
+      </ul>
+
+      <h3>Export Recommendations</h3>
+      <p><strong>For publications and presentations:</strong> Export as SVG for best quality and editability. SVG files are vector-based, resolution-independent, and can be further refined in Adobe Illustrator, Inkscape, or similar software.</p>
+      <p><strong>For quick sharing:</strong> PNG exports work well for slides and documents where raster images are acceptable.</p>
     </div>
 
     <div class="footer">
-      Vibe coded by <a href="https://www.linkedin.com/in/vijaystarvj/" target="_blank">Vijaya Raghavan KANNAN</a><br>❤️
+      Vibe coded by <a href="https://www.linkedin.com/in/vijaystarvj/" target="_blank" rel="noopener">Vijaya Raghavan KANNAN</a><br>
+      with love and precision<br>
+      <span style="font-size:16px">❤️</span> Made for researchers worldwide
     </div>
   </aside>
 
@@ -532,11 +794,141 @@ Path2, #b91c1c</textarea>
 
 <div class="toast" id="toast"></div>
 
+<!-- Preview Modal -->
+<div class="modal-overlay" id="previewModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Export Preview</h3>
+      <button class="modal-close" onclick="closePreview()" aria-label="Close preview">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="preview-info">
+        <span>📐</span>
+        <div>
+          <strong>Dimensions:</strong> <span id="previewDimensions">—</span> · 
+          <strong>Format:</strong> <span id="previewFormat">—</span> · 
+          <strong>Scale:</strong> <span id="previewScale">—</span>×
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:16px;line-height:1.5" id="previewExplanation">
+        Preview shows actual export size. Scroll within the preview to see the full image.
+      </div>
+      <div class="preview-container" id="previewContainer">
+        <div style="color:var(--text3);font-size:14px">Generating preview...</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closePreview()">Cancel</button>
+      <button class="btn btn-good" onclick="confirmExport()" id="confirmExportBtn">
+        <span style="font-size:14px">✓</span> Confirm & Download
+      </button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ===== STATE ===== */
 let lastParsed = [];
 let customAnnotations = [];
 let barrierMarkers = [];
+let previewExportData = null; // Store export data for confirmation
+
+/* ===== TOOLTIP SYSTEM ===== */
+let tooltipTimers = new Map();
+
+function initTooltips() {
+  document.querySelectorAll('[data-tooltip]').forEach(el => {
+    el.classList.add('has-tooltip');
+    
+    // Create tooltip element
+    const tooltipText = document.createElement('div');
+    tooltipText.className = 'tooltip-text';
+    tooltipText.textContent = el.getAttribute('data-tooltip');
+    el.appendChild(tooltipText);
+    
+    // Hover handlers
+    el.addEventListener('mouseenter', () => {
+      const timer = setTimeout(() => {
+        el.classList.add('show-tooltip');
+      }, 3000); // 3 second delay
+      tooltipTimers.set(el, timer);
+    });
+    
+    el.addEventListener('mouseleave', () => {
+      const timer = tooltipTimers.get(el);
+      if (timer) clearTimeout(timer);
+      tooltipTimers.delete(el);
+      el.classList.remove('show-tooltip');
+    });
+  });
+}
+
+/* ===== PREVIEW MODAL ===== */
+function closePreview() {
+  document.getElementById('previewModal').classList.remove('show');
+  previewExportData = null;
+}
+
+function showPreview(format, width, height, scale) {
+  const modal = document.getElementById('previewModal');
+  const container = document.getElementById('previewContainer');
+  const explanation = document.getElementById('previewExplanation');
+  
+  // Set preview info
+  document.getElementById('previewDimensions').textContent = `${width} × ${height} px`;
+  document.getElementById('previewFormat').textContent = format.toUpperCase();
+  document.getElementById('previewScale').textContent = scale;
+  
+  // Update explanation with actual values
+  explanation.textContent = `Preview shows actual export size (${width} × ${height} px at ${scale}× scale = ${width*scale} × ${height*scale} effective pixels). Scroll within the preview to see the full image.`;
+  
+  // Show modal
+  modal.classList.add('show');
+  
+  // Generate preview at ACTUAL export dimensions
+  container.innerHTML = '<div style="color:var(--text3);font-size:14px;padding:40px">Generating preview at actual export size...</div>';
+  
+  // Get background setting
+  const bg = document.getElementById('exportBg').value;
+  const useBg = bg === 'white' ? '#ffffff' : 'rgba(0,0,0,0)';
+  
+  // Generate preview at actual export dimensions with scale
+  Plotly.toImage('plot', { 
+    format: 'png', 
+    width: width, 
+    height: height, 
+    scale: scale 
+  }).then(dataUrl => {
+    // Create a container that shows the actual pixel dimensions
+    container.innerHTML = `
+      <div style="overflow:auto;max-width:100%;max-height:70vh;border:1px solid var(--border);border-radius:var(--radius-sm);background:${useBg === 'rgba(0,0,0,0)' ? 'var(--surface2)' : useBg}">
+        <img src="${dataUrl}" 
+             style="display:block; width:${width}px; height:${height}px; image-rendering: crisp-edges;"
+             alt="Export preview at actual dimensions">
+      </div>
+    `;
+  }).catch(err => {
+    container.innerHTML = '<div style="color:var(--danger);font-size:14px;padding:40px">Preview generation failed. Try reducing dimensions or scale.</div>';
+    console.error('Preview error:', err);
+  });
+  
+  // Store export data for confirmation
+  previewExportData = { format, width, height, scale };
+}
+
+function confirmExport() {
+  if (!previewExportData) return;
+  
+  const { format, width, height, scale } = previewExportData;
+  closePreview();
+  
+  // Perform actual export
+  if (format === 'pdf') {
+    actualDownloadPDF(width, height, scale);
+  } else {
+    actualDownloadImage(format, width, height, scale);
+  }
+}
 
 const palettes = {
   default: ['#1a1a1a','#b91c1c','#166534','#1d4ed8','#7e22ce','#c2410c','#0e7490','#a21caf','#525252'],
@@ -575,7 +967,7 @@ function toast(msg) {
   el.textContent = msg;
   el.classList.add('show');
   clearTimeout(el._t);
-  el._t = setTimeout(() => el.classList.remove('show'), 2200);
+  el._t = setTimeout(() => el.classList.remove('show'), 2500);
 }
 
 /* ===== PARSING ===== */
@@ -602,7 +994,6 @@ function parseData() {
     if (p.length >= 4) {
       const step = Number(p[1]), e = Number(p[3]);
       
-      // Default 5th column options
       let hideLabel = false;
       let hideEnergy = false;
       let shiftY = 0;
@@ -646,7 +1037,6 @@ function labelText(d) {
   const c = document.getElementById('labelChoice').value;
   if (c === 'none') return '';
 
-  // Determine visibility based on global dropdown AND row-specific flags
   let showL = (c === 'all' || c === 'name') && !d.hideLabel;
   let showE = (c === 'all' || c === 'energy') && !d.hideEnergy;
 
@@ -721,7 +1111,7 @@ function getLegendConfig() {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   const showLegendBorder = document.getElementById('legendBorderChoice')?.value === 'show';
   const legendBorderWidth = showLegendBorder ? 1 : 0;
-  const legendBorderColor = isDark ? '#4b5563' : '#d1d5db';
+  const legendBorderColor = isDark ? '#64748b' : '#cbd5e1';
 
   switch(pos) {
     case 'bottom-h': return { show: true, orientation: 'h', x: 0.5, xanchor: 'center', y: -0.15, yanchor: 'top', font: { size: axisFontSize - 1 }, borderwidth: legendBorderWidth, bordercolor: legendBorderColor };
@@ -729,8 +1119,8 @@ function getLegendConfig() {
     case 'top-right': return { show: true, orientation: 'v', x: 1, xanchor: 'right', y: 1, yanchor: 'top', font: { size: axisFontSize - 1 }, borderwidth: legendBorderWidth, bordercolor: legendBorderColor };
     case 'top-left': return { show: true, orientation: 'v', x: 0, xanchor: 'left', y: 1, yanchor: 'top', font: { size: axisFontSize - 1 }, borderwidth: legendBorderWidth, bordercolor: legendBorderColor };
     case 'right': return { show: true, orientation: 'v', x: 1.02, xanchor: 'left', y: 0.5, yanchor: 'middle', font: { size: axisFontSize - 1 }, borderwidth: legendBorderWidth, bordercolor: legendBorderColor };
-    case 'inside-top-right': return { show: true, orientation: 'v', x: 0.98, xanchor: 'right', y: 0.98, yanchor: 'top', bgcolor: isDark ? 'rgba(17,24,39,0.8)' : 'rgba(255,255,255,0.8)', bordercolor: legendBorderColor, borderwidth: showLegendBorder ? 1 : 0, font: { size: axisFontSize - 1 } };
-    case 'inside-top-left': return { show: true, orientation: 'v', x: 0.02, xanchor: 'left', y: 0.98, yanchor: 'top', bgcolor: isDark ? 'rgba(17,24,39,0.8)' : 'rgba(255,255,255,0.8)', bordercolor: legendBorderColor, borderwidth: showLegendBorder ? 1 : 0, font: { size: axisFontSize - 1 } };
+    case 'inside-top-right': return { show: true, orientation: 'v', x: 0.98, xanchor: 'right', y: 0.98, yanchor: 'top', bgcolor: isDark ? 'rgba(30,41,59,0.9)' : 'rgba(255,255,255,0.9)', bordercolor: legendBorderColor, borderwidth: showLegendBorder ? 1 : 0, font: { size: axisFontSize - 1 } };
+    case 'inside-top-left': return { show: true, orientation: 'v', x: 0.02, xanchor: 'left', y: 0.98, yanchor: 'top', bgcolor: isDark ? 'rgba(30,41,59,0.9)' : 'rgba(255,255,255,0.9)', bordercolor: legendBorderColor, borderwidth: showLegendBorder ? 1 : 0, font: { size: axisFontSize - 1 } };
     case 'none': return { show: false };
     default: return { show: true, orientation: 'h', x: 0.5, xanchor: 'center', y: -0.15, yanchor: 'top', font: { size: axisFontSize - 1 }, borderwidth: legendBorderWidth, bordercolor: legendBorderColor };
   }
@@ -739,7 +1129,7 @@ function getLegendConfig() {
 function drawPlot() {
   const data = parseData();
   if (data.length < 2) {
-    toast('Need at least 2 valid data points');
+    toast('⚠️ Need at least 2 valid data points');
     Plotly.purge('plot');
     return;
   }
@@ -752,7 +1142,7 @@ function drawPlot() {
   const cw = Number(document.getElementById('connectorWidth').value) || 1.5;
   const lt = Number(document.getElementById('levelThickness').value) || 3;
   const fontSize = Number(document.getElementById('labelFontSize').value) || 11;
-  const fontFamily = document.getElementById('fontFamily')?.value || 'DM Sans';
+  const fontFamily = document.getElementById('fontFamily')?.value || 'Inter';
   const titleFontSize = Number(document.getElementById('titleFontSize').value) || 18;
   const axisFontSize = Number(document.getElementById('axisFontSize').value) || 13;
   const alignMode = document.getElementById('stepAlign')?.value || 'vertical';
@@ -766,7 +1156,6 @@ function drawPlot() {
     const color = getPathColor(name, gi);
     const offset = (gi - (groups.length - 1) / 2) * gap;
     
-    // Connector Dash style resolution
     const dash = connectorDashPref === 'auto' ? (gi === 0 ? 'solid' : 'dot') : connectorDashPref;
 
     if (style === 'levels') {
@@ -774,14 +1163,12 @@ function drawPlot() {
         const x = d.step + offset;
         traces.push({ x: [x - width / 2, x + width / 2], y: [d.energy, d.energy], mode: 'lines', type: 'scatter', line: { color, width: lt }, showlegend: false, hoverinfo: 'skip' });
         
-        // Optional marker points on the energy level center
         if (showMarkers) {
           traces.push({ x: [x], y: [d.energy], mode: 'markers', type: 'scatter', marker: { size: 6, color }, showlegend: false, hoverinfo: 'skip' });
         }
 
         const txt = labelText(d);
         if (txt) {
-          // X-Y Shift logic
           const xPos = d.shiftX !== 0 ? x + d.shiftX : x;
           const yPos = d.shiftY !== 0 ? d.energy + d.shiftY : d.energy;
           const pixShift = d.shiftY !== 0 ? 0 : 20; 
@@ -794,7 +1181,6 @@ function drawPlot() {
         traces.push(connectorTrace(a.step + offset + width / 2, a.energy, b.step + offset - width / 2, b.energy, color, dash, name, i === 0, shape, cw));
       }
     } else {
-      // Point-to-point uses annotations exclusively for text to support X/Y shifts
       const plotlyShape = shape === 'hv' ? 'hv' : shape === 'spline' ? 'spline' : 'linear';
       traces.push({ 
         x: pts.map(d => d.step + offset), 
@@ -824,8 +1210,8 @@ function drawPlot() {
   customAnnotations.forEach(a => {
     annotations.push({
       x: a.x, y: a.y, text: texToHtml(a.text),
-      showarrow: a.arrow, arrowhead: 2, arrowsize: 1, arrowwidth: 1.5, arrowcolor: isDark ? '#aaa' : '#555',
-      font: { size: a.size || 12, color: a.color || (isDark ? '#e4e4e7' : '#1a1a1a'), family: fontFamily },
+      showarrow: a.arrow, arrowhead: 2, arrowsize: 1, arrowwidth: 1.5, arrowcolor: isDark ? '#94a3b8' : '#475569',
+      font: { size: a.size || 12, color: a.color || (isDark ? '#e2e8f0' : '#1e293b'), family: fontFamily },
       ax: a.ax || 0, ay: a.ay || -30
     });
   });
@@ -843,7 +1229,7 @@ function drawPlot() {
     
     const diff = (to.energy - from.energy).toFixed(1);
     const bmDash = bm.style || 'dash';
-    const lineColor = isDark ? '#888' : '#555';
+    const lineColor = isDark ? '#94a3b8' : '#475569';
     
     let rawLabel = bm.labelType || 'ΔE^{‡}';
     if (rawLabel === 'custom') rawLabel = bm.customText || '';
@@ -855,25 +1241,25 @@ function drawPlot() {
     traces.push({ x: [x, x], y: [from.energy, to.energy], mode: 'lines', type: 'scatter', line: { color: lineColor, width: 1.2, dash: bmDash }, showlegend: false, hoverinfo: 'skip' });
     annotations.push({ x, y: to.energy, ax: 0, ay: to.energy > from.energy ? 10 : -10, text: '', showarrow: true, arrowhead: 3, arrowsize: 0.8, arrowwidth: 1.2, arrowcolor: lineColor });
     annotations.push({ x, y: from.energy, ax: 0, ay: from.energy > to.energy ? 10 : -10, text: '', showarrow: true, arrowhead: 3, arrowsize: 0.8, arrowwidth: 1.2, arrowcolor: lineColor });
-    annotations.push({ x, y: (from.energy + to.energy) / 2, text: labelHtml, showarrow: false, xshift: xShift, xanchor: xAnchor, font: { size: fontSize, color: isDark ? '#ccc' : '#333', family: fontFamily } });
+    annotations.push({ x, y: (from.energy + to.energy) / 2, text: labelHtml, showarrow: false, xshift: xShift, xanchor: xAnchor, font: { size: fontSize, color: isDark ? '#cbd5e1' : '#334155', family: fontFamily } });
   });
 
   const allSteps = data.map(d => d.step);
   const minStep = Math.min(...allSteps), maxStep = Math.max(...allSteps);
   const grid = document.getElementById('gridChoice').value;
   const showX = document.getElementById('xAxisChoice').value === 'show';
-  const showY = document.getElementById('yAxisChoice')?.value !== 'hide'; // Default to show if missing
+  const showY = document.getElementById('yAxisChoice')?.value !== 'hide';
   const showZero = document.getElementById('zeroLineChoice').value === 'show';
   const boxBorder = document.getElementById('boxBorderChoice')?.value === 'show';
   
-  const plotBg = isDark ? '#111827' : '#ffffff';
-  const paperBg = isDark ? '#111827' : '#ffffff';
+  const plotBg = isDark ? '#1e293b' : '#ffffff';
+  const paperBg = isDark ? '#1e293b' : '#ffffff';
   const gridColor = isDark
     ? (grid === 'light' ? 'rgba(255,255,255,.04)' : 'rgba(255,255,255,.1)')
     : (grid === 'light' ? 'rgba(0,0,0,.04)' : 'rgba(0,0,0,.1)');
-  const fontColor = isDark ? '#f9fafb' : '#111827';
+  const fontColor = isDark ? '#f1f5f9' : '#0f172a';
   const legendCfg = getLegendConfig();
-  const rightMargin = (legendCfg.show && document.getElementById('legendPosition')?.value === 'right') ? 120 : 35;
+  const rightMargin = (legendCfg.show && document.getElementById('legendPosition')?.value === 'right') ? 140 : 40;
 
   const xLabel = document.getElementById('xLabel')?.value || 'Reaction step';
   const yLabel = document.getElementById('yLabel')?.value || 'Relative energy (kcal mol⁻¹)';
@@ -882,7 +1268,7 @@ function drawPlot() {
     title: { text: texToHtml(document.getElementById('plotTitle').value), font: { size: titleFontSize, family: fontFamily, color: fontColor } },
     font: { family: fontFamily, color: fontColor },
     plot_bgcolor: plotBg, paper_bgcolor: paperBg,
-    margin: { l: 80, r: rightMargin, t: 70, b: 70 },
+    margin: { l: 85, r: rightMargin, t: 75, b: 75 },
     showlegend: legendCfg.show,
     legend: { orientation: legendCfg.orientation, x: legendCfg.x, xanchor: legendCfg.xanchor, y: legendCfg.y, yanchor: legendCfg.yanchor, font: { size: legendCfg.font?.size || 12, family: fontFamily }, bgcolor: legendCfg.bgcolor, bordercolor: legendCfg.bordercolor, borderwidth: legendCfg.borderwidth },
     annotations,
@@ -892,7 +1278,7 @@ function drawPlot() {
       showticklabels: showX, 
       showline: showX || boxBorder, 
       linecolor: gridColor,
-      mirror: boxBorder ? 'allTicks' : false,
+      mirror: boxBorder ? 'allticks' : false,
       zeroline: false, 
       showgrid: grid === 'full', 
       gridcolor: gridColor, 
@@ -904,7 +1290,7 @@ function drawPlot() {
       showticklabels: showY,
       showline: showY || boxBorder,
       linecolor: gridColor,
-      mirror: boxBorder ? 'allTicks' : false,
+      mirror: boxBorder ? 'allticks' : false,
       zeroline: showZero, 
       zerolinewidth: 1.5, 
       zerolinecolor: isDark ? 'rgba(255,255,255,.2)' : 'rgba(0,0,0,.25)', 
@@ -917,7 +1303,7 @@ function drawPlot() {
   Plotly.newPlot('plot', traces, layout, { responsive: true, displaylogo: false, modeBarButtonsToRemove: ['lasso2d', 'select2d'] });
   updateStats(data, groups);
   updateTable(data);
-  toast('Diagram updated');
+  toast('✓ Diagram updated successfully');
 }
 
 /* ===== STATS ===== */
@@ -951,12 +1337,16 @@ function removeAnnotation(i) {
 
 function renderAnnoList() {
   const el = document.getElementById('annoList');
+  if (!customAnnotations.length) {
+    el.innerHTML = '<div class="empty-state">No custom annotations added yet</div>';
+    return;
+  }
   el.innerHTML = customAnnotations.map((a, i) => `
     <div class="anno-item">
-      <input value="${a.text}" placeholder="Text" onchange="customAnnotations[${i}].text=this.value" style="flex:2">
-      <input type="number" value="${a.x}" step="0.5" onchange="customAnnotations[${i}].x=+this.value" title="X" style="width:52px;flex:0">
-      <input type="number" value="${a.y}" step="1" onchange="customAnnotations[${i}].y=+this.value" title="Y" style="width:60px;flex:0">
-      <button class="btn btn-danger btn-sm" onclick="removeAnnotation(${i})">✕</button>
+      <input value="${escapeHTML(a.text)}" placeholder="Text" onchange="customAnnotations[${i}].text=this.value" style="flex:2">
+      <input type="number" value="${a.x}" step="0.5" onchange="customAnnotations[${i}].x=+this.value" title="X coordinate" style="width:60px;flex:0">
+      <input type="number" value="${a.y}" step="1" onchange="customAnnotations[${i}].y=+this.value" title="Y coordinate" style="width:70px;flex:0">
+      <button class="btn btn-danger btn-sm" onclick="removeAnnotation(${i})" title="Remove">✕</button>
     </div>
   `).join('');
 }
@@ -973,27 +1363,28 @@ function addBarrierMarker() {
   
   if (path && Number.isFinite(from) && Number.isFinite(to)) {
     const pathData = lastParsed.filter(d => d.path === path);
-    if (!pathData.length) { toast(`Error: Pathway '${path}' not found`); return; }
+    if (!pathData.length) { toast(`⚠️ Pathway '${path}' not found`); return; }
     
     const hasFrom = pathData.some(d => d.step === from);
     const hasTo = pathData.some(d => d.step === to);
-    if (!hasFrom || !hasTo) { toast(`Error: Steps ${from} and ${to} must exist in pathway`); return; }
+    if (!hasFrom || !hasTo) { toast(`⚠️ Steps ${from} and ${to} must exist in pathway`); return; }
 
     barrierMarkers.push({ from, to, path, style, labelType, customText, textSide, offsetX });
     renderBarrierList();
-    toast(`Barrier: ${path} step ${from} → ${to}`);
+    toast(`✓ Barrier added: ${path} step ${from} → ${to}`);
   }
 }
 
 function removeBarrier(i) {
   barrierMarkers.splice(i, 1);
   renderBarrierList();
+  toast('✓ Barrier removed');
 }
 
 function renderBarrierList() {
   const el = document.getElementById('barrierList');
   if (!barrierMarkers.length) { 
-    el.innerHTML = '<div style="font-size:11px;color:var(--text3);padding:4px 0">No barriers added yet.</div>'; 
+    el.innerHTML = '<div class="empty-state">No barrier markers added yet</div>'; 
     return; 
   }
   
@@ -1005,15 +1396,16 @@ function renderBarrierList() {
     
     return `
     <div class="anno-item">
-      <span style="font-size:11px;font-family:var(--mono);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${safePath}: step ${bm.from} → ${bm.to} | ${escapeHTML(displayLabel)} (${bm.textSide})">
+      <span style="font-size:11.5px;font-family:var(--mono);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${safePath}: step ${bm.from} → ${bm.to} | ${escapeHTML(displayLabel)} (${bm.textSide})">
         <b>${safePath}</b> ${bm.from}→${bm.to} &nbsp;${displayLabelHtml} <span style="color:var(--text3)">${bm.textSide} ${bm.style}</span>${offsetText}
       </span>
-      <button class="btn btn-danger btn-sm" onclick="removeBarrier(${i})">✕</button>
+      <button class="btn btn-danger btn-sm" onclick="removeBarrier(${i})" title="Remove">✕</button>
     </div>`;
   }).join('');
 }
 
 renderBarrierList();
+renderAnnoList();
 
 /* ===== PRESETS ===== */
 const presetData = {
@@ -1066,7 +1458,7 @@ Oxidative, 5, ROO•, -18.60`
 function loadPreset(key) {
   document.getElementById('dataInput').value = presetData[key] || presetData.multi;
   drawPlot();
-  toast('Preset loaded');
+  toast('✓ Preset loaded');
 }
 
 /* ===== EXPORT ===== */
@@ -1074,29 +1466,41 @@ function downloadImage(format) {
   const w = +document.getElementById('exportW').value || 1500;
   const h = +document.getElementById('exportH').value || 950;
   const s = +document.getElementById('exportScale').value || 2;
+  
+  // Show preview instead of direct download
+  showPreview(format, w, h, s);
+}
+
+function actualDownloadImage(format, width, height, scale) {
   const bg = document.getElementById('exportBg').value;
 
   if (bg === 'transparent') {
     Plotly.relayout('plot', { plot_bgcolor: 'rgba(0,0,0,0)', paper_bgcolor: 'rgba(0,0,0,0)' }).then(() => {
-      Plotly.downloadImage('plot', { format, filename: `pes_diagram.${format}`, width: w, height: h, scale: s });
+      Plotly.downloadImage('plot', { format, filename: `pes_diagram.${format}`, width, height, scale });
       setTimeout(() => drawPlot(), 500);
     });
   } else {
-    Plotly.downloadImage('plot', { format, filename: `pes_diagram.${format}`, width: w, height: h, scale: s });
+    Plotly.downloadImage('plot', { format, filename: `pes_diagram.${format}`, width, height, scale });
   }
-  toast(`${format.toUpperCase()} exported`);
+  toast(`✓ ${format.toUpperCase()} exported successfully`);
 }
 
 async function downloadPDF() {
   const w = +document.getElementById('exportW').value || 1500;
   const h = +document.getElementById('exportH').value || 950;
   const s = +document.getElementById('exportScale').value || 2;
+  
+  // Show preview instead of direct download
+  showPreview('pdf', w, h, s);
+}
+
+async function actualDownloadPDF(width, height, scale) {
   const bg = document.getElementById('exportBg').value;
 
   if (bg === 'transparent') {
     await Plotly.relayout('plot', { plot_bgcolor: 'rgba(0,0,0,0)', paper_bgcolor: 'rgba(0,0,0,0)' });
   }
-  const png = await Plotly.toImage('plot', { format: 'png', width: w, height: h, scale: s });
+  const png = await Plotly.toImage('plot', { format: 'png', width, height, scale });
   if (bg === 'transparent') setTimeout(() => drawPlot(), 100);
 
   const { jsPDF } = window.jspdf;
@@ -1105,7 +1509,7 @@ async function downloadPDF() {
   const margin = 24;
   pdf.addImage(png, 'PNG', margin, margin, pageW - 2 * margin, pageH - 2 * margin);
   pdf.save('pes_diagram.pdf');
-  toast('PDF exported');
+  toast('✓ PDF exported successfully');
 }
 
 function downloadCSV() {
@@ -1118,15 +1522,20 @@ function downloadCSV() {
   a.download = 'pes_data.csv';
   a.click();
   URL.revokeObjectURL(a.href);
-  toast('CSV exported');
+  toast('✓ CSV data exported');
 }
 
 function copyData() {
   const text = document.getElementById('dataInput').value;
-  try { navigator.clipboard?.writeText(text).then(() => toast('Copied to clipboard')); } catch(e) { toast('Copy not available'); }
+  try { 
+    navigator.clipboard?.writeText(text).then(() => toast('✓ Data copied to clipboard')); 
+  } catch(e) { 
+    toast('⚠️ Clipboard not available'); 
+  }
 }
 
 function clearData() {
+  if (!confirm('Are you sure you want to clear all data, annotations, and barriers?')) return;
   document.getElementById('dataInput').value = '';
   document.getElementById('statsArea').style.display = 'none';
   document.getElementById('tableWrap').style.display = 'none';
@@ -1135,7 +1544,7 @@ function clearData() {
   renderAnnoList();
   renderBarrierList();
   Plotly.purge('plot');
-  toast('Cleared');
+  toast('✓ All data cleared');
 }
 
 /* ===== RUNSCRIPT ===== */
@@ -1145,7 +1554,6 @@ function generateScript() {
   lines.push('PESMaker Input');
   lines.push('');
 
-  // Data block
   lines.push('  Data');
   const dataText = g('dataInput').trim();
   dataText.split('\n').forEach(l => {
@@ -1155,7 +1563,6 @@ function generateScript() {
   lines.push('  End');
   lines.push('');
 
-  // Style block
   lines.push('  Style');
   const styleKeys = [
     ['PlotTitle', 'plotTitle'],
@@ -1192,7 +1599,6 @@ function generateScript() {
   lines.push('  End');
   lines.push('');
 
-  // CustomColors block
   const colorsText = g('colorInput').trim();
   if (colorsText) {
     lines.push('  CustomColors');
@@ -1204,7 +1610,6 @@ function generateScript() {
     lines.push('');
   }
 
-  // Annotations block
   if (customAnnotations.length) {
     lines.push('  Annotations');
     customAnnotations.forEach(a => {
@@ -1214,7 +1619,6 @@ function generateScript() {
     lines.push('');
   }
 
-  // Barriers block
   if (barrierMarkers.length) {
     lines.push('  Barriers');
     lines.push('    # pathway, from, to, lineStyle, labelType, textSide, offsetX');
@@ -1229,15 +1633,15 @@ function generateScript() {
   lines.push('End Input');
 
   document.getElementById('scriptEditor').value = lines.join('\n');
-  toast('Script generated');
+  toast('✓ Script generated');
 }
 
 function loadScript() {
   const text = document.getElementById('scriptEditor').value.trim();
-  if (!text) { toast('Script editor is empty'); return; }
+  if (!text) { toast('⚠️ Script editor is empty'); return; }
 
   if (!text.startsWith('PESMaker Input') && !text.startsWith('PESArchitect Input')) { 
-    toast('Invalid script: must start with "PESMaker Input"'); return; 
+    toast('⚠️ Invalid script format'); return; 
   }
 
   function extractBlock(name) {
@@ -1362,19 +1766,23 @@ function loadScript() {
   renderBarrierList();
 
   drawPlot();
-  toast('Script loaded — diagram redrawn');
+  toast('✓ Script loaded — diagram redrawn');
 }
 
 function copyScript() {
   const text = document.getElementById('scriptEditor').value;
   if (!text) { generateScript(); }
   const val = document.getElementById('scriptEditor').value;
-  try { navigator.clipboard?.writeText(val).then(() => toast('Script copied')); } catch(e) { toast('Copy not available'); }
+  try { 
+    navigator.clipboard?.writeText(val).then(() => toast('✓ Script copied to clipboard')); 
+  } catch(e) { 
+    toast('⚠️ Clipboard not available'); 
+  }
 }
 
 function clearScript() {
   document.getElementById('scriptEditor').value = '';
-  toast('Script editor cleared');
+  toast('✓ Script editor cleared');
 }
 
 /* ===== KEYBOARD SHORTCUT ===== */
@@ -1383,7 +1791,22 @@ document.addEventListener('keydown', e => {
 });
 
 /* ===== INIT ===== */
-drawPlot();
+// Wait for Plotly to load before initializing
+function initApp() {
+  if (typeof Plotly !== 'undefined') {
+    drawPlot();
+    initTooltips(); // Initialize tooltip system
+  } else {
+    setTimeout(initApp, 100);
+  }
+}
+
+// Start when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
 </script>
 </body>
 </html>

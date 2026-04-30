@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PES Architect — Potential Energy Surface Diagram Tool</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #f4f3ef;
+  --surface: #ffffff;
+  --surface2: #f9f8f5;
+  --text: #1a1a1a;
+  --text2: #5c5c5c;
+  --text3: #999;
+  --border: #e0ded8;
+  --accent: #1d4ed8;
+  --accent-light: #dbeafe;
+  --danger: #b91c1c;
+  --good: #166534;
+  --good-light: #dcfce7;
+  --shadow: 0 1px 3px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.06);
+  --radius: 10px;
+  --mono: 'JetBrains Mono', 'Consolas', monospace;
+  --sans: 'DM Sans', system-ui, sans-serif;
+  --header-bg: #1a1a1a;
+  --header-text: #f4f3ef;
+  --tab-active: var(--accent);
+  --tab-inactive: transparent;
+  --input-bg: #fff;
+  --tag-bg: #e8e6e1;
+}
+[data-theme="dark"] {
+  --bg: #111113;
+  --surface: #1c1c1f;
+  --surface2: #232326;
+  --text: #e4e4e7;
+  --text2: #a1a1aa;
+  --text3: #5c5c66;
+  --border: #2e2e33;
+  --accent: #60a5fa;
+  --accent-light: #1e3a5f;
+  --danger: #ef4444;
+  --good: #34d399;
+  --good-light: #064e3b;
+  --shadow: 0 1px 3px rgba(0,0,0,.2), 0 8px 24px rgba(0,0,0,.25);
+  --header-bg: #09090b;
+  --header-text: #e4e4e7;
+  --input-bg: #232326;
+  --tag-bg: #2e2e33;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* === HEADER === */
+.header{background:var(--header-bg);color:var(--header-text);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(255,255,255,.06)}
+.header-left{display:flex;align-items:center;gap:14px}
+.logo{width:32px;height:32px;border-radius:6px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:white;letter-spacing:-.5px}
+.header h1{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.header-right{display:flex;gap:8px;align-items:center}
+.theme-toggle{background:none;border:1px solid rgba(255,255,255,.15);border-radius:8px;color:var(--header-text);padding:6px 10px;cursor:pointer;font-size:15px;display:flex;align-items:center;transition:.2s}
+.theme-toggle:hover{background:rgba(255,255,255,.08)}
+
+/* === LAYOUT === */
+.app{display:grid;grid-template-columns:400px 1fr;gap:0;min-height:calc(100vh - 56px)}
+.sidebar{background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;max-height:calc(100vh - 56px);position:sticky;top:56px}
+.plot-area{padding:20px;display:flex;flex-direction:column;gap:16px;overflow:hidden}
+
+/* === SIDEBAR === */
+.tabs{display:flex;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:10}
+.tab{flex:1;padding:11px 8px;text-align:center;font-size:12px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;cursor:pointer;border-bottom:2px solid transparent;color:var(--text2);transition:.15s;background:none;border-top:none;border-left:none;border-right:none}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab:hover{color:var(--text)}
+.tab-content{display:none;padding:16px}
+.tab-content.active{display:block}
+
+label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);margin:14px 0 5px}
+label:first-child{margin-top:0}
+textarea,input,select{width:100%;border:1px solid var(--border);border-radius:var(--radius);padding:9px 11px;font-size:13px;background:var(--input-bg);color:var(--text);font-family:var(--sans);transition:.15s}
+textarea{font-family:var(--mono);font-size:12px;line-height:1.55;resize:vertical}
+textarea:focus,input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-light)}
+.data-area{min-height:260px}
+.color-area{min-height:72px}
+
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+
+.hint{font-size:11px;color:var(--text3);margin-top:6px;line-height:1.5}
+
+/* === BUTTONS === */
+.btn{border:none;border-radius:var(--radius);padding:9px 14px;font-weight:600;font-size:12.5px;cursor:pointer;font-family:var(--sans);transition:.15s;display:inline-flex;align-items:center;justify-content:center;gap:6px;letter-spacing:.2px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{filter:brightness(1.1)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{background:var(--surface2);border-color:var(--text3)}
+.btn-good{background:var(--good);color:#fff}
+.btn-good:hover{filter:brightness(1.1)}
+.btn-danger{background:transparent;border:1px solid var(--danger);color:var(--danger)}
+.btn-danger:hover{background:var(--danger);color:#fff}
+.btn-sm{padding:6px 10px;font-size:11.5px}
+
+.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
+.action-full{grid-column:1/-1}
+.export-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+
+/* === STATS === */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
+.stat-card{background:var(--surface2);border-radius:var(--radius);padding:10px 12px;border:1px solid var(--border)}
+.stat-label{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);font-weight:600}
+.stat-value{font-size:16px;font-weight:700;margin-top:2px;font-family:var(--mono)}
+.stat-sub{font-size:10px;color:var(--text2);margin-top:1px}
+
+/* === TABLE === */
+.table-wrap{margin-top:14px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;max-height:260px;overflow-y:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:var(--surface2);font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--text2);font-weight:600;position:sticky;top:0}
+th,td{padding:7px 10px;text-align:right;border-bottom:1px solid var(--border)}
+th:first-child,td:first-child{text-align:left}
+td{font-family:var(--mono);font-size:11.5px}
+tr:last-child td{border-bottom:none}
+
+/* === ANNOTATION PANEL === */
+.anno-item{display:flex;gap:6px;align-items:center;margin-bottom:6px;padding:6px 8px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)}
+.anno-item input{flex:1;font-size:12px;padding:5px 8px}
+.anno-item .btn{flex-shrink:0}
+
+/* === PLOT === */
+#plot{width:100%;flex:1;min-height:620px;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow)}
+
+/* === TOAST === */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:var(--bg);padding:10px 18px;border-radius:var(--radius);font-size:13px;font-weight:500;opacity:0;transform:translateY(12px);transition:.3s;z-index:999;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* === PRESETS === */
+.preset-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;background:var(--tag-bg);color:var(--text2);cursor:pointer;border:1px solid transparent;transition:.15s}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.chip.active{background:var(--accent-light);color:var(--accent);border-color:var(--accent)}
+
+/* === RESPONSIVE === */
+@media(max-width:960px){
+  .app{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .sidebar{max-height:none;position:static;border-right:none;border-bottom:1px solid var(--border)}
+  #plot{min-height:480px}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo">PE</div>
+    <h1>PES Architect</h1>
+  </div>
+  <div class="header-right">
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode">◐</button>
+  </div>
+</div>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="tabs">
+      <button class="tab active" data-tab="data" onclick="switchTab(this)">Data</button>
+      <button class="tab" data-tab="style" onclick="switchTab(this)">Style</button>
+      <button class="tab" data-tab="annotate" onclick="switchTab(this)">Annotate</button>
+      <button class="tab" data-tab="script" onclick="switchTab(this)">Script</button>
+      <button class="tab" data-tab="export" onclick="switchTab(this)">Export</button>
+    </div>
+
+    <!-- DATA TAB -->
+    <div class="tab-content active" id="tab-data">
+      <label>Pathway data</label>
+      <textarea id="dataInput" class="data-area" spellcheck="false"># pathway, step, label, energy (kcal/mol)
+Main, 1, R, 0.00
+Main, 2, TS1, 32.40
+Main, 3, INT1, -5.20
+Main, 4, TS2, 41.70
+Main, 5, P, -12.30
+
+Alt-A, 1, R, 0.00
+Alt-A, 2, TS1a, 28.60
+Alt-A, 3, INT-A, -8.10
+Alt-A, 4, TS2a, 35.50
+Alt-A, 5, P-A, -20.40
+
+Alt-B, 1, R, 0.00
+Alt-B, 2, TS1b, 38.20
+Alt-B, 3, INT-B, 2.30
+Alt-B, 4, P-B, -4.70</textarea>
+      <div class="hint">Columns: pathway, step, label, energy. Comma / tab / semicolon delimiters. Shared step numbers align species vertically.</div>
+
+      <label>Quick-load presets</label>
+      <div class="preset-chips">
+        <span class="chip" onclick="loadPreset('sn2')">S<sub>N</sub>2</span>
+        <span class="chip" onclick="loadPreset('multi')">Multi-path</span>
+        <span class="chip" onclick="loadPreset('catalytic')">Catalytic cycle</span>
+        <span class="chip" onclick="loadPreset('degradation')">Degradation</span>
+      </div>
+
+      <div class="row" style="margin-top:14px">
+        <div><label>Energy treatment</label>
+          <select id="energyMode"><option value="raw">As given</option><option value="relative">Shift min → 0</option></select>
+        </div>
+        <div><label>Step alignment</label>
+          <select id="stepAlign"><option value="vertical">Aligned</option><option value="offset">Offset pathways</option></select>
+        </div>
+      </div>
+
+      <div class="action-grid">
+        <button class="btn btn-primary action-full" onclick="drawPlot()">⟶ &nbsp;Draw diagram</button>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats" id="statsArea" style="display:none">
+        <div class="stat-card"><div class="stat-label">Pathways</div><div class="stat-value" id="statPaths">—</div></div>
+        <div class="stat-card"><div class="stat-label">Points</div><div class="stat-value" id="statPts">—</div></div>
+        <div class="stat-card"><div class="stat-label">Global min</div><div class="stat-value" id="statMin">—</div><div class="stat-sub" id="statMinLabel"></div></div>
+        <div class="stat-card"><div class="stat-label">Global max</div><div class="stat-value" id="statMax">—</div><div class="stat-sub" id="statMaxLabel"></div></div>
+      </div>
+
+      <div class="table-wrap" id="tableWrap" style="display:none"><table id="pointTable"></table></div>
+    </div>
+
+    <!-- STYLE TAB -->
+    <div class="tab-content" id="tab-style">
+      <div class="row">
+        <div><label>Plot title</label><input id="plotTitle" value="Multi-pathway PES diagram"></div>
+        <div><label>Y-axis label</label><input id="yLabel" value="Relative energy (kcal mol⁻¹)"></div>
+      </div>
+      <div class="row">
+        <div><label>Diagram style</label>
+          <select id="diagramStyle"><option value="levels">Energy levels</option><option value="points">Point-to-point</option></select>
+        </div>
+        <div><label>Connector style</label>
+          <select id="lineShape"><option value="spline">Smooth curve</option><option value="linear">Straight</option><option value="hv">Step-like</option></select>
+        </div>
+      </div>
+      <div class="row">
+        <div><label>Background grid</label>
+          <select id="gridChoice"><option value="light">Light grid</option><option value="off">No grid</option><option value="full">Full grid</option></select>
+        </div>
+        <div><label>Zero line</label>
+          <select id="zeroLineChoice"><option value="show">Show</option><option value="hide">Hide</option></select>
+        </div>
+      </div>
+      <div class="row">
+        <div><label>X-axis</label>
+          <select id="xAxisChoice"><option value="hide">Hidden</option><option value="show">Visible</option></select>
+        </div>
+        <div><label>Species labels</label>
+          <select id="labelChoice"><option value="all">Label + energy</option><option value="name">Label only</option><option value="energy">Energy only</option><option value="none">None</option></select>
+        </div>
+      </div>
+      <div class="row">
+        <div><label>Level bar width</label>
+          <input id="levelWidth" type="number" min="0.1" max="0.9" step="0.05" value="0.45">
+        </div>
+        <div><label>Connector width</label>
+          <input id="connectorWidth" type="number" min="0.5" max="5" step="0.5" value="1.5">
+        </div>
+      </div>
+      <div class="row">
+        <div><label>Level bar thickness</label>
+          <input id="levelThickness" type="number" min="1" max="8" step="0.5" value="3">
+        </div>
+        <div><label>Label font size</label>
+          <input id="labelFontSize" type="number" min="8" max="18" step="1" value="11">
+        </div>
+      </div>
+      <div class="row">
+        <div><label>Font family</label>
+          <select id="fontFamily">
+            <option value="DM Sans">DM Sans</option>
+            <option value="Arial">Arial</option>
+            <option value="Helvetica">Helvetica</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Courier New">Courier New</option>
+            <option value="Palatino">Palatino</option>
+            <option value="Garamond">Garamond</option>
+            <option value="Cambria">Cambria</option>
+            <option value="Verdana">Verdana</option>
+          </select>
+        </div>
+        <div><label>Title font size</label>
+          <input id="titleFontSize" type="number" min="10" max="30" step="1" value="18">
+        </div>
+      </div>
+      <div class="row">
+        <div><label>Axis font size</label>
+          <input id="axisFontSize" type="number" min="8" max="20" step="1" value="13">
+        </div>
+        <div><label>Legend position</label>
+          <select id="legendPosition">
+            <option value="bottom-h">Bottom (horizontal)</option>
+            <option value="bottom-v">Bottom (vertical)</option>
+            <option value="top-right">Top right</option>
+            <option value="top-left">Top left</option>
+            <option value="right">Right side</option>
+            <option value="inside-top-right">Inside top right</option>
+            <option value="inside-top-left">Inside top left</option>
+            <option value="none">Hide legend</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div><label>Pathway colors</label>
+          <select id="colorMode"><option value="auto">Automatic</option><option value="custom">Custom</option></select>
+        </div>
+        <div><label>Color palette</label>
+          <select id="paletteChoice">
+            <option value="default">Default</option>
+            <option value="muted">Muted earth</option>
+            <option value="vivid">Vivid</option>
+            <option value="pastel">Pastel</option>
+            <option value="mono">Monochrome</option>
+          </select>
+        </div>
+      </div>
+      <label>Custom colors <span style="font-weight:400;text-transform:none;letter-spacing:0">(pathway, #hex)</span></label>
+      <textarea id="colorInput" class="color-area" spellcheck="false">Main, #1a1a1a
+Alt-A, #b91c1c
+Alt-B, #166534</textarea>
+
+      <div class="action-grid">
+        <button class="btn btn-primary action-full" onclick="drawPlot()">⟶ &nbsp;Redraw</button>
+      </div>
+    </div>
+
+    <!-- ANNOTATE TAB -->
+    <div class="tab-content" id="tab-annotate">
+      <label>Custom annotations</label>
+      <div class="hint" style="margin-top:0;margin-bottom:10px">Add text labels or arrows anywhere on the diagram. Coordinates match the plot axes.</div>
+      <div id="annoList"></div>
+      <button class="btn btn-outline btn-sm" onclick="addAnnotation()" style="margin-top:8px">+ Add annotation</button>
+
+      <label style="margin-top:20px">Barrier markers (ΔE‡)</label>
+      <div class="hint" style="margin-top:0;margin-bottom:10px">Draw vertical ΔE‡ arrows between two steps on a pathway. Add as many as needed.</div>
+      <div id="barrierList"></div>
+      <div class="row" style="margin-top:8px">
+        <div><input id="barrierPath" value="Main" placeholder="Pathway"></div>
+        <div style="display:flex;gap:4px">
+          <input id="barrierFrom" type="number" value="1" min="1" placeholder="From" title="From step">
+          <input id="barrierTo" type="number" value="2" min="1" placeholder="To" title="To step">
+        </div>
+      </div>
+      <div class="row" style="margin-top:6px">
+        <div>
+          <select id="barrierStyle">
+            <option value="dash">Dashed line</option>
+            <option value="solid">Solid line</option>
+            <option value="dot">Dotted line</option>
+          </select>
+        </div>
+        <div>
+          <button class="btn btn-outline btn-sm" style="width:100%" onclick="addBarrierMarker()">+ Add barrier</button>
+        </div>
+      </div>
+
+      <div class="action-grid" style="margin-top:20px">
+        <button class="btn btn-primary action-full" onclick="drawPlot()">⟶ &nbsp;Redraw with annotations</button>
+      </div>
+    </div>
+
+    <!-- SCRIPT TAB -->
+    <div class="tab-content" id="tab-script">
+      <label>PES Runscript</label>
+      <div class="hint" style="margin-top:0;margin-bottom:10px">AMS-style text config that captures all settings, data, annotations, and barriers. Generate from current state, edit directly, or paste a saved script to restore.</div>
+      <textarea id="scriptEditor" spellcheck="false" style="min-height:380px;font-family:var(--mono);font-size:11.5px;line-height:1.5;tab-size:2"></textarea>
+      <div class="action-grid" style="margin-top:10px">
+        <button class="btn btn-primary" onclick="generateScript()">⤓ Generate script</button>
+        <button class="btn btn-good" onclick="loadScript()">⤒ Load script</button>
+        <button class="btn btn-outline" onclick="copyScript()">Copy to clipboard</button>
+        <button class="btn btn-outline" onclick="clearScript()">Clear editor</button>
+      </div>
+      <div class="hint" style="margin-top:10px">
+        <b>Workflow:</b> Click "Generate script" to snapshot current state. Edit inline if needed. Click "Load script" to restore. You can also generate these blocks from Python post-processing and paste here directly.
+      </div>
+    </div>
+
+    <!-- EXPORT TAB -->
+    <div class="tab-content" id="tab-export">
+      <label>Image export</label>
+      <div class="hint" style="margin-top:0;margin-bottom:10px">High-resolution exports at 2× scale. PDF uses landscape A4.</div>
+      <div class="row">
+        <div><label>Width (px)</label><input id="exportW" type="number" value="1500"></div>
+        <div><label>Height (px)</label><input id="exportH" type="number" value="950"></div>
+      </div>
+      <div class="row" style="margin-top:6px">
+        <div><label>Scale factor</label><input id="exportScale" type="number" min="1" max="4" step="1" value="2"></div>
+        <div><label>Background</label>
+          <select id="exportBg"><option value="white">White</option><option value="transparent">Transparent</option></select>
+        </div>
+      </div>
+
+      <div class="export-grid">
+        <button class="btn btn-good" onclick="downloadImage('png')">PNG</button>
+        <button class="btn btn-good" onclick="downloadImage('svg')">SVG</button>
+        <button class="btn btn-good" onclick="downloadPDF()">PDF</button>
+        <button class="btn btn-outline" onclick="downloadCSV()">CSV</button>
+      </div>
+
+      <label style="margin-top:20px">Data management</label>
+      <div class="action-grid">
+        <button class="btn btn-outline" onclick="copyData()">Copy data to clipboard</button>
+        <button class="btn btn-danger" onclick="clearData()">Clear all</button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="plot-area">
+    <div id="plot"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== STATE ===== */
+let lastParsed = [];
+let customAnnotations = [];
+let barrierMarkers = [];
+let undoStack = [];
+
+const palettes = {
+  default: ['#1a1a1a','#b91c1c','#166534','#1d4ed8','#7e22ce','#c2410c','#0e7490','#a21caf','#525252'],
+  muted:   ['#4a4543','#8b5e3c','#5b7553','#4a6fa5','#8b6fa5','#a07855','#5b8a7a','#7a5c5c','#6b6b6b'],
+  vivid:   ['#e63946','#457b9d','#2a9d8f','#e9c46a','#f4a261','#264653','#a855f7','#06b6d4','#1a1a1a'],
+  pastel:  ['#6b9dbd','#e8998d','#8fbc8f','#c7a0d0','#f0c987','#88b7c5','#d4a5a5','#a8c5a0','#b5b5b5'],
+  mono:    ['#1a1a1a','#404040','#666666','#888888','#aaaaaa','#333333','#555555','#777777','#999999']
+};
+
+/* ===== THEME ===== */
+function toggleTheme() {
+  const d = document.documentElement;
+  const next = d.getAttribute('data-theme') === 'dark' ? '' : 'dark';
+  d.setAttribute('data-theme', next);
+  try { localStorage.setItem('pes-theme', next); } catch(e) {}
+  drawPlot();
+}
+(function() {
+  try {
+    const saved = localStorage.getItem('pes-theme');
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+  } catch(e) {}
+})();
+
+/* ===== TABS ===== */
+function switchTab(btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+}
+
+/* ===== TOAST ===== */
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+/* ===== PARSING ===== */
+function splitLine(line) {
+  if (line.includes(',')) return line.split(',');
+  if (line.includes(';')) return line.split(';');
+  return line.split(/\t+/);
+}
+
+function parseData() {
+  const text = document.getElementById('dataInput').value.trim();
+  if (!text) return [];
+  const rows = text.split(/\n+/).map(l => l.trim()).filter(l => l && !l.startsWith('#'));
+  const data = [];
+  rows.forEach((line, i) => {
+    const p = splitLine(line).map(s => s.trim());
+    if (p.length >= 4) {
+      const step = Number(p[1]), e = Number(p[3]);
+      if (Number.isFinite(step) && Number.isFinite(e))
+        data.push({ path: p[0], step, label: p[2], energyRaw: e, row: i + 1 });
+    }
+  });
+  if (!data.length) return [];
+  const minE = Math.min(...data.map(d => d.energyRaw));
+  const mode = document.getElementById('energyMode').value;
+  return data.map(d => ({ ...d, energy: mode === 'relative' ? d.energyRaw - minE : d.energyRaw }));
+}
+
+function grouped(data) {
+  const m = new Map();
+  data.forEach(d => { if (!m.has(d.path)) m.set(d.path, []); m.get(d.path).push(d); });
+  m.forEach(v => v.sort((a, b) => a.step - b.step));
+  return [...m.entries()];
+}
+
+function labelText(d) {
+  const c = document.getElementById('labelChoice').value;
+  if (c === 'none') return '';
+  if (c === 'name') return d.label;
+  if (c === 'energy') return d.energy.toFixed(2);
+  return `${d.label}<br>${d.energy.toFixed(2)}`;
+}
+
+/* ===== COLORS ===== */
+function parseCustomColors() {
+  const map = {};
+  (document.getElementById('colorInput')?.value || '').split(/\n+/).forEach(line => {
+    const p = line.split(/[,;\t]+/).map(s => s.trim()).filter(Boolean);
+    if (p.length >= 2 && /^#([0-9a-fA-F]{3,8})$/.test(p[1])) map[p[0]] = p[1];
+  });
+  return map;
+}
+
+function getPalette() {
+  return palettes[document.getElementById('paletteChoice')?.value || 'default'] || palettes.default;
+}
+
+function getPathColor(name, gi) {
+  const mode = document.getElementById('colorMode')?.value || 'auto';
+  if (mode === 'custom') { const c = parseCustomColors(); if (c[name]) return c[name]; }
+  return getPalette()[gi % getPalette().length];
+}
+
+/* ===== CONNECTOR ===== */
+function connectorTrace(x1, y1, x2, y2, color, dash, name, showLegend, shape, cw) {
+  const common = { mode: 'lines', type: 'scatter', line: { color, width: cw, dash }, name, showlegend: showLegend, hovertemplate: `${name}<extra></extra>` };
+  if (shape === 'hv') {
+    const mid = (x1 + x2) / 2;
+    return { ...common, x: [x1, mid, mid, x2], y: [y1, y1, y2, y2] };
+  }
+  if (shape === 'spline') {
+    const mid = (x1 + x2) / 2;
+    return { ...common, x: [x1, mid, x2], y: [y1, (y1 + y2) / 2, y2], line: { ...common.line, shape: 'spline', smoothing: 1.3 } };
+  }
+  return { ...common, x: [x1, x2], y: [y1, y2] };
+}
+
+/* ===== DRAW ===== */
+function getLegendConfig() {
+  const pos = document.getElementById('legendPosition')?.value || 'bottom-h';
+  const axisFontSize = Number(document.getElementById('axisFontSize').value) || 13;
+  switch(pos) {
+    case 'bottom-h': return { show: true, orientation: 'h', x: 0.5, xanchor: 'center', y: -0.15, yanchor: 'top', font: { size: axisFontSize - 1 } };
+    case 'bottom-v': return { show: true, orientation: 'v', x: 0.5, xanchor: 'center', y: -0.15, yanchor: 'top', font: { size: axisFontSize - 1 } };
+    case 'top-right': return { show: true, orientation: 'v', x: 1, xanchor: 'right', y: 1, yanchor: 'top', font: { size: axisFontSize - 1 } };
+    case 'top-left': return { show: true, orientation: 'v', x: 0, xanchor: 'left', y: 1, yanchor: 'top', font: { size: axisFontSize - 1 } };
+    case 'right': return { show: true, orientation: 'v', x: 1.02, xanchor: 'left', y: 0.5, yanchor: 'middle', font: { size: axisFontSize - 1 } };
+    case 'inside-top-right': return { show: true, orientation: 'v', x: 0.98, xanchor: 'right', y: 0.98, yanchor: 'top', bgcolor: 'rgba(255,255,255,0.7)', bordercolor: 'rgba(0,0,0,0.1)', borderwidth: 1, font: { size: axisFontSize - 1 } };
+    case 'inside-top-left': return { show: true, orientation: 'v', x: 0.02, xanchor: 'left', y: 0.98, yanchor: 'top', bgcolor: 'rgba(255,255,255,0.7)', bordercolor: 'rgba(0,0,0,0.1)', borderwidth: 1, font: { size: axisFontSize - 1 } };
+    case 'none': return { show: false };
+    default: return { show: true, orientation: 'h', x: 0.5, xanchor: 'center', y: -0.15, yanchor: 'top', font: { size: axisFontSize - 1 } };
+  }
+}
+
+function drawPlot() {
+  const data = parseData();
+  if (data.length < 2) {
+    toast('Need at least 2 valid data points');
+    Plotly.purge('plot');
+    return;
+  }
+  lastParsed = data;
+  const groups = grouped(data);
+  const style = document.getElementById('diagramStyle').value;
+  const shape = document.getElementById('lineShape').value;
+  const width = Number(document.getElementById('levelWidth').value) || 0.45;
+  const cw = Number(document.getElementById('connectorWidth').value) || 1.5;
+  const lt = Number(document.getElementById('levelThickness').value) || 3;
+  const fontSize = Number(document.getElementById('labelFontSize').value) || 11;
+  const fontFamily = document.getElementById('fontFamily')?.value || 'DM Sans';
+  const titleFontSize = Number(document.getElementById('titleFontSize').value) || 18;
+  const axisFontSize = Number(document.getElementById('axisFontSize').value) || 13;
+  const alignMode = document.getElementById('stepAlign')?.value || 'vertical';
+  const gap = alignMode === 'offset' ? 0.18 : 0;
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const traces = [];
+  const annotations = [];
+
+  groups.forEach(([name, pts], gi) => {
+    const color = getPathColor(name, gi);
+    const offset = (gi - (groups.length - 1) / 2) * gap;
+    const dash = gi === 0 ? 'solid' : 'dot';
+
+    if (style === 'levels') {
+      pts.forEach(d => {
+        const x = d.step + offset;
+        traces.push({ x: [x - width / 2, x + width / 2], y: [d.energy, d.energy], mode: 'lines', type: 'scatter', line: { color, width: lt }, showlegend: false, hoverinfo: 'skip' });
+        const txt = labelText(d);
+        if (txt) annotations.push({ x, y: d.energy, text: txt, showarrow: false, yshift: d.energy >= 0 ? 20 : -20, font: { color, size: fontSize, family: fontFamily }, align: 'center' });
+      });
+      for (let i = 0; i < pts.length - 1; i++) {
+        const a = pts[i], b = pts[i + 1];
+        traces.push(connectorTrace(a.step + offset + width / 2, a.energy, b.step + offset - width / 2, b.energy, color, dash, name, i === 0, shape, cw));
+      }
+    } else {
+      const plotlyShape = shape === 'hv' ? 'hv' : shape === 'spline' ? 'spline' : 'linear';
+      traces.push({ x: pts.map(d => d.step + offset), y: pts.map(d => d.energy), mode: 'lines+markers+text', type: 'scatter', name, line: { color, width: 2, shape: plotlyShape, smoothing: 1.2 }, marker: { size: 8, color }, text: pts.map(labelText), textposition: 'top center', textfont: { size: fontSize, family: fontFamily }, hovertemplate: `${name}<br>%{text}<extra></extra>` });
+    }
+  });
+
+  // Custom annotations
+  customAnnotations.forEach(a => {
+    annotations.push({
+      x: a.x, y: a.y, text: a.text,
+      showarrow: a.arrow, arrowhead: 2, arrowsize: 1, arrowwidth: 1.5, arrowcolor: isDark ? '#aaa' : '#555',
+      font: { size: a.size || 12, color: a.color || (isDark ? '#e4e4e7' : '#1a1a1a'), family: fontFamily },
+      ax: a.ax || 0, ay: a.ay || -30
+    });
+  });
+
+  // Barrier markers
+  barrierMarkers.forEach(bm => {
+    const grp = groups.find(([n]) => n === bm.path);
+    if (!grp) return;
+    const from = grp[1].find(d => d.step === bm.from);
+    const to = grp[1].find(d => d.step === bm.to);
+    if (!from || !to) return;
+    const x = (from.step + to.step) / 2 + 0.55;
+    const diff = Math.abs(to.energy - from.energy).toFixed(1);
+    const bmDash = bm.style || 'dash';
+    traces.push({ x: [x, x], y: [from.energy, to.energy], mode: 'lines', type: 'scatter', line: { color: isDark ? '#888' : '#555', width: 1.2, dash: bmDash }, showlegend: false, hoverinfo: 'skip' });
+    // arrowheads at both ends
+    annotations.push({ x, y: to.energy, ax: 0, ay: to.energy > from.energy ? 10 : -10, text: '', showarrow: true, arrowhead: 3, arrowsize: 0.8, arrowwidth: 1.2, arrowcolor: isDark ? '#888' : '#555' });
+    annotations.push({ x, y: from.energy, ax: 0, ay: from.energy > to.energy ? 10 : -10, text: '', showarrow: true, arrowhead: 3, arrowsize: 0.8, arrowwidth: 1.2, arrowcolor: isDark ? '#888' : '#555' });
+    annotations.push({ x, y: (from.energy + to.energy) / 2, text: `ΔE‡ = ${diff}`, showarrow: false, xshift: 8, font: { size: fontSize, color: isDark ? '#ccc' : '#333', family: fontFamily } });
+  });
+
+  const allSteps = data.map(d => d.step);
+  const minStep = Math.min(...allSteps), maxStep = Math.max(...allSteps);
+  const grid = document.getElementById('gridChoice').value;
+  const showX = document.getElementById('xAxisChoice').value === 'show';
+  const showZero = document.getElementById('zeroLineChoice').value === 'show';
+  const plotBg = isDark ? '#1c1c1f' : '#ffffff';
+  const paperBg = isDark ? '#1c1c1f' : '#ffffff';
+  const gridColor = isDark
+    ? (grid === 'light' ? 'rgba(255,255,255,.06)' : 'rgba(255,255,255,.12)')
+    : (grid === 'light' ? 'rgba(0,0,0,.06)' : 'rgba(0,0,0,.14)');
+  const fontColor = isDark ? '#e4e4e7' : '#1a1a1a';
+  const legendCfg = getLegendConfig();
+  const rightMargin = (legendCfg.show && document.getElementById('legendPosition')?.value === 'right') ? 120 : 35;
+
+  const layout = {
+    title: { text: document.getElementById('plotTitle').value, font: { size: titleFontSize, family: fontFamily, color: fontColor } },
+    font: { family: fontFamily, color: fontColor },
+    plot_bgcolor: plotBg, paper_bgcolor: paperBg,
+    margin: { l: 80, r: rightMargin, t: 70, b: 70 },
+    showlegend: legendCfg.show,
+    legend: { orientation: legendCfg.orientation, x: legendCfg.x, xanchor: legendCfg.xanchor, y: legendCfg.y, yanchor: legendCfg.yanchor, font: { size: legendCfg.font?.size || 12, family: fontFamily }, bgcolor: legendCfg.bgcolor, bordercolor: legendCfg.bordercolor, borderwidth: legendCfg.borderwidth },
+    annotations,
+    xaxis: { title: showX ? { text: 'Reaction step', font: { size: axisFontSize } } : '', range: [minStep - 0.8, maxStep + 0.8], showticklabels: showX, showline: showX, zeroline: false, showgrid: grid === 'full', gridcolor: gridColor, dtick: 1, tickfont: { size: axisFontSize - 1 } },
+    yaxis: { title: { text: document.getElementById('yLabel').value, font: { size: axisFontSize } }, zeroline: showZero, zerolinewidth: 1.5, zerolinecolor: isDark ? 'rgba(255,255,255,.25)' : 'rgba(0,0,0,.35)', showgrid: grid !== 'off', gridcolor: gridColor, tickfont: { size: axisFontSize - 1 } }
+  };
+
+  Plotly.newPlot('plot', traces, layout, { responsive: true, displaylogo: false, modeBarButtonsToRemove: ['lasso2d', 'select2d'] });
+  updateStats(data, groups);
+  updateTable(data);
+  toast('Diagram updated');
+}
+
+/* ===== STATS ===== */
+function updateStats(data, groups) {
+  document.getElementById('statsArea').style.display = 'grid';
+  document.getElementById('statPaths').textContent = groups.length;
+  document.getElementById('statPts').textContent = data.length;
+  const min = data.reduce((a, b) => a.energy < b.energy ? a : b);
+  const max = data.reduce((a, b) => a.energy > b.energy ? a : b);
+  document.getElementById('statMin').textContent = min.energy.toFixed(2);
+  document.getElementById('statMinLabel').textContent = `${min.path} / ${min.label}`;
+  document.getElementById('statMax').textContent = max.energy.toFixed(2);
+  document.getElementById('statMaxLabel').textContent = `${max.path} / ${max.label}`;
+}
+
+function updateTable(data) {
+  document.getElementById('tableWrap').style.display = 'block';
+  document.getElementById('pointTable').innerHTML = '<thead><tr><th>Path</th><th>Step</th><th>Label</th><th>Energy</th></tr></thead><tbody>' + data.map(d => `<tr><td>${d.path}</td><td>${d.step}</td><td>${d.label}</td><td>${d.energy.toFixed(3)}</td></tr>`).join('') + '</tbody>';
+}
+
+/* ===== ANNOTATIONS ===== */
+function addAnnotation() {
+  customAnnotations.push({ x: 2, y: 20, text: 'Annotation', arrow: true, ax: 0, ay: -30, size: 12, color: '' });
+  renderAnnoList();
+}
+
+function removeAnnotation(i) {
+  customAnnotations.splice(i, 1);
+  renderAnnoList();
+}
+
+function renderAnnoList() {
+  const el = document.getElementById('annoList');
+  el.innerHTML = customAnnotations.map((a, i) => `
+    <div class="anno-item">
+      <input value="${a.text}" placeholder="Text" onchange="customAnnotations[${i}].text=this.value" style="flex:2">
+      <input type="number" value="${a.x}" step="0.5" onchange="customAnnotations[${i}].x=+this.value" title="X" style="width:52px;flex:0">
+      <input type="number" value="${a.y}" step="1" onchange="customAnnotations[${i}].y=+this.value" title="Y" style="width:60px;flex:0">
+      <button class="btn btn-danger btn-sm" onclick="removeAnnotation(${i})">✕</button>
+    </div>
+  `).join('');
+}
+
+function addBarrierMarker() {
+  const from = +document.getElementById('barrierFrom').value;
+  const to = +document.getElementById('barrierTo').value;
+  const path = document.getElementById('barrierPath').value.trim();
+  const style = document.getElementById('barrierStyle')?.value || 'dash';
+  if (path && Number.isFinite(from) && Number.isFinite(to)) {
+    barrierMarkers.push({ from, to, path, style });
+    renderBarrierList();
+    toast(`Barrier: ${path} step ${from} → ${to}`);
+  }
+}
+
+function removeBarrier(i) {
+  barrierMarkers.splice(i, 1);
+  renderBarrierList();
+}
+
+function renderBarrierList() {
+  const el = document.getElementById('barrierList');
+  if (!barrierMarkers.length) { el.innerHTML = '<div style="font-size:11px;color:var(--text3);padding:4px 0">No barriers added yet.</div>'; return; }
+  el.innerHTML = barrierMarkers.map((bm, i) => `
+    <div class="anno-item">
+      <span style="font-size:11px;font-family:var(--mono);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${bm.path}: step ${bm.from} → ${bm.to}">
+        <b>${bm.path}</b> &nbsp;${bm.from} → ${bm.to} &nbsp;<span style="color:var(--text3)">(${bm.style})</span>
+      </span>
+      <button class="btn btn-danger btn-sm" onclick="removeBarrier(${i})">✕</button>
+    </div>
+  `).join('');
+}
+renderBarrierList();
+
+/* ===== PRESETS ===== */
+const presetData = {
+  sn2: `# SN2 reaction PES
+SN2, 1, Nu⁻ + RX, 0.00
+SN2, 2, TS, 18.50
+SN2, 3, Products, -8.20`,
+
+  multi: `# Multi-path PES
+Main, 1, R, 0.00
+Main, 2, TS1, 32.40
+Main, 3, INT1, -5.20
+Main, 4, TS2, 41.70
+Main, 5, P, -12.30
+
+Alt-A, 1, R, 0.00
+Alt-A, 2, TS1a, 28.60
+Alt-A, 3, INT-A, -8.10
+Alt-A, 4, TS2a, 35.50
+Alt-A, 5, P-A, -20.40
+
+Alt-B, 1, R, 0.00
+Alt-B, 2, TS1b, 38.20
+Alt-B, 3, INT-B, 2.30
+Alt-B, 4, P-B, -4.70`,
+
+  catalytic: `# Catalytic cycle
+Cat, 1, E + S, 0.00
+Cat, 2, TS1, 14.20
+Cat, 3, E·S, -6.80
+Cat, 4, TS2, 10.50
+Cat, 5, E·P, -3.20
+Cat, 6, TS3, 5.80
+Cat, 7, E + P, -9.40`,
+
+  degradation: `# β-H scission PES (illustrative)
+β-scission, 1, Polymer, 0.00
+β-scission, 2, TS-abs, 38.50
+β-scission, 3, Macro-radical, 12.40
+β-scission, 4, TS-β, 52.30
+β-scission, 5, Fragments, 28.10
+
+Oxidative, 1, Polymer, 0.00
+Oxidative, 2, TS-H-abs, 28.20
+Oxidative, 3, R•, -5.30
+Oxidative, 4, TS-O₂, 8.70
+Oxidative, 5, ROO•, -18.60`
+};
+
+function loadPreset(key) {
+  document.getElementById('dataInput').value = presetData[key] || presetData.multi;
+  drawPlot();
+  toast('Preset loaded');
+}
+
+/* ===== EXPORT ===== */
+function downloadImage(format) {
+  const w = +document.getElementById('exportW').value || 1500;
+  const h = +document.getElementById('exportH').value || 950;
+  const s = +document.getElementById('exportScale').value || 2;
+  const bg = document.getElementById('exportBg').value;
+
+  if (bg === 'transparent') {
+    // Temporarily set transparent bg for export
+    Plotly.relayout('plot', { plot_bgcolor: 'rgba(0,0,0,0)', paper_bgcolor: 'rgba(0,0,0,0)' }).then(() => {
+      Plotly.downloadImage('plot', { format, filename: `pes_diagram.${format}`, width: w, height: h, scale: s });
+      // Restore original bg after a short delay
+      setTimeout(() => drawPlot(), 500);
+    });
+  } else {
+    Plotly.downloadImage('plot', { format, filename: `pes_diagram.${format}`, width: w, height: h, scale: s });
+  }
+  toast(`${format.toUpperCase()} exported`);
+}
+
+async function downloadPDF() {
+  const w = +document.getElementById('exportW').value || 1500;
+  const h = +document.getElementById('exportH').value || 950;
+  const s = +document.getElementById('exportScale').value || 2;
+  const bg = document.getElementById('exportBg').value;
+
+  if (bg === 'transparent') {
+    await Plotly.relayout('plot', { plot_bgcolor: 'rgba(0,0,0,0)', paper_bgcolor: 'rgba(0,0,0,0)' });
+  }
+  const png = await Plotly.toImage('plot', { format: 'png', width: w, height: h, scale: s });
+  if (bg === 'transparent') setTimeout(() => drawPlot(), 100);
+
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+  const pageW = pdf.internal.pageSize.getWidth(), pageH = pdf.internal.pageSize.getHeight();
+  const margin = 24;
+  pdf.addImage(png, 'PNG', margin, margin, pageW - 2 * margin, pageH - 2 * margin);
+  pdf.save('pes_diagram.pdf');
+  toast('PDF exported');
+}
+
+function downloadCSV() {
+  if (!lastParsed.length) drawPlot();
+  const rows = ['pathway,step,label,energy,raw_energy'];
+  lastParsed.forEach(d => rows.push(`"${d.path}",${d.step},"${d.label}",${d.energy},${d.energyRaw}`));
+  const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'pes_data.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('CSV exported');
+}
+
+function copyData() {
+  const text = document.getElementById('dataInput').value;
+  try { navigator.clipboard?.writeText(text).then(() => toast('Copied to clipboard')); } catch(e) { toast('Copy not available'); }
+}
+
+function clearData() {
+  document.getElementById('dataInput').value = '';
+  document.getElementById('statsArea').style.display = 'none';
+  document.getElementById('tableWrap').style.display = 'none';
+  customAnnotations = [];
+  barrierMarkers = [];
+  renderAnnoList();
+  renderBarrierList();
+  Plotly.purge('plot');
+  toast('Cleared');
+}
+
+/* ===== RUNSCRIPT ===== */
+function generateScript() {
+  const g = id => document.getElementById(id)?.value || '';
+  const lines = [];
+  lines.push('PESArchitect Input');
+  lines.push('');
+
+  // Data block
+  lines.push('  Data');
+  const dataText = g('dataInput').trim();
+  dataText.split('\n').forEach(l => {
+    const t = l.trim();
+    if (t) lines.push('    ' + t);
+  });
+  lines.push('  End');
+  lines.push('');
+
+  // Style block
+  lines.push('  Style');
+  const styleKeys = [
+    ['PlotTitle', 'plotTitle'],
+    ['YLabel', 'yLabel'],
+    ['DiagramStyle', 'diagramStyle'],
+    ['LineShape', 'lineShape'],
+    ['FontFamily', 'fontFamily'],
+    ['TitleFontSize', 'titleFontSize'],
+    ['LabelFontSize', 'labelFontSize'],
+    ['AxisFontSize', 'axisFontSize'],
+    ['LevelWidth', 'levelWidth'],
+    ['ConnectorWidth', 'connectorWidth'],
+    ['LevelThickness', 'levelThickness'],
+    ['GridChoice', 'gridChoice'],
+    ['ZeroLine', 'zeroLineChoice'],
+    ['XAxis', 'xAxisChoice'],
+    ['LabelChoice', 'labelChoice'],
+    ['EnergyMode', 'energyMode'],
+    ['StepAlign', 'stepAlign'],
+    ['ColorMode', 'colorMode'],
+    ['Palette', 'paletteChoice'],
+    ['LegendPosition', 'legendPosition'],
+  ];
+  styleKeys.forEach(([key, id]) => {
+    const val = g(id);
+    if (val) lines.push('    ' + key + '=' + val);
+  });
+  lines.push('  End');
+  lines.push('');
+
+  // CustomColors block
+  const colorsText = g('colorInput').trim();
+  if (colorsText) {
+    lines.push('  CustomColors');
+    colorsText.split('\n').forEach(l => {
+      const t = l.trim();
+      if (t) lines.push('    ' + t);
+    });
+    lines.push('  End');
+    lines.push('');
+  }
+
+  // Annotations block
+  if (customAnnotations.length) {
+    lines.push('  Annotations');
+    customAnnotations.forEach(a => {
+      lines.push(`    x=${a.x}  y=${a.y}  text="${a.text}"  arrow=${a.arrow}  ax=${a.ax||0}  ay=${a.ay||-30}  size=${a.size||12}  color=${a.color||'auto'}`);
+    });
+    lines.push('  End');
+    lines.push('');
+  }
+
+  // Barriers block
+  if (barrierMarkers.length) {
+    lines.push('  Barriers');
+    barrierMarkers.forEach(bm => {
+      lines.push(`    ${bm.path}, ${bm.from}, ${bm.to}, ${bm.style || 'dash'}`);
+    });
+    lines.push('  End');
+    lines.push('');
+  }
+
+  lines.push('End Input');
+
+  document.getElementById('scriptEditor').value = lines.join('\n');
+  toast('Script generated');
+}
+
+function loadScript() {
+  const text = document.getElementById('scriptEditor').value.trim();
+  if (!text) { toast('Script editor is empty'); return; }
+
+  // Check wrapper
+  if (!text.startsWith('PESArchitect Input')) { toast('Invalid script: must start with "PESArchitect Input"'); return; }
+
+  // Extract blocks
+  function extractBlock(name) {
+    const re = new RegExp('^\\s*' + name + '\\s*$', 'im');
+    const endRe = /^\s*End\s*$/im;
+    const lines = text.split('\n');
+    let inside = false, result = [];
+    for (const line of lines) {
+      if (!inside && re.test(line)) { inside = true; continue; }
+      if (inside && endRe.test(line)) break;
+      if (inside) result.push(line);
+    }
+    return result;
+  }
+
+  // Parse Data
+  const dataLines = extractBlock('Data');
+  if (dataLines.length) {
+    document.getElementById('dataInput').value = dataLines.map(l => l.trim()).filter(Boolean).join('\n');
+  }
+
+  // Parse Style
+  const styleLines = extractBlock('Style');
+  const styleMap = {};
+  styleLines.forEach(line => {
+    const t = line.trim();
+    const eq = t.indexOf('=');
+    if (eq > 0) {
+      const key = t.substring(0, eq).trim();
+      const val = t.substring(eq + 1).trim();
+      styleMap[key] = val;
+    }
+  });
+
+  const setVal = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.value = val; };
+  setVal('plotTitle', styleMap['PlotTitle']);
+  setVal('yLabel', styleMap['YLabel']);
+  setVal('diagramStyle', styleMap['DiagramStyle']);
+  setVal('lineShape', styleMap['LineShape']);
+  setVal('fontFamily', styleMap['FontFamily']);
+  setVal('titleFontSize', styleMap['TitleFontSize']);
+  setVal('labelFontSize', styleMap['LabelFontSize']);
+  setVal('axisFontSize', styleMap['AxisFontSize']);
+  setVal('levelWidth', styleMap['LevelWidth']);
+  setVal('connectorWidth', styleMap['ConnectorWidth']);
+  setVal('levelThickness', styleMap['LevelThickness']);
+  setVal('gridChoice', styleMap['GridChoice']);
+  setVal('zeroLineChoice', styleMap['ZeroLine']);
+  setVal('xAxisChoice', styleMap['XAxis']);
+  setVal('labelChoice', styleMap['LabelChoice']);
+  setVal('energyMode', styleMap['EnergyMode']);
+  setVal('stepAlign', styleMap['StepAlign']);
+  setVal('colorMode', styleMap['ColorMode']);
+  setVal('paletteChoice', styleMap['Palette']);
+  setVal('legendPosition', styleMap['LegendPosition']);
+
+  // Parse CustomColors
+  const colorLines = extractBlock('CustomColors');
+  if (colorLines.length) {
+    document.getElementById('colorInput').value = colorLines.map(l => l.trim()).filter(Boolean).join('\n');
+  }
+
+  // Parse Annotations
+  const annoLines = extractBlock('Annotations');
+  customAnnotations = [];
+  annoLines.forEach(line => {
+    const t = line.trim();
+    if (!t) return;
+    const get = (key, def) => {
+      const re = new RegExp(key + '=("([^"]*)"|([^\\s]*))', 'i');
+      const m = t.match(re);
+      return m ? (m[2] !== undefined ? m[2] : m[3]) : def;
+    };
+    customAnnotations.push({
+      x: parseFloat(get('x', '2')),
+      y: parseFloat(get('y', '20')),
+      text: get('text', 'Annotation'),
+      arrow: get('arrow', 'true') === 'true',
+      ax: parseFloat(get('ax', '0')),
+      ay: parseFloat(get('ay', '-30')),
+      size: parseFloat(get('size', '12')),
+      color: get('color', '') === 'auto' ? '' : get('color', '')
+    });
+  });
+  renderAnnoList();
+
+  // Parse Barriers
+  const barrierLines = extractBlock('Barriers');
+  barrierMarkers = [];
+  barrierLines.forEach(line => {
+    const t = line.trim();
+    if (!t) return;
+    const parts = t.split(/[,;\t]+/).map(s => s.trim());
+    if (parts.length >= 3) {
+      barrierMarkers.push({
+        path: parts[0],
+        from: +parts[1],
+        to: +parts[2],
+        style: parts[3] || 'dash'
+      });
+    }
+  });
+  renderBarrierList();
+
+  // Draw
+  drawPlot();
+  toast('Script loaded — diagram redrawn');
+}
+
+function copyScript() {
+  const text = document.getElementById('scriptEditor').value;
+  if (!text) { generateScript(); }
+  const val = document.getElementById('scriptEditor').value;
+  try { navigator.clipboard?.writeText(val).then(() => toast('Script copied')); } catch(e) { toast('Copy not available'); }
+}
+
+function clearScript() {
+  document.getElementById('scriptEditor').value = '';
+  toast('Script editor cleared');
+}
+
+/* ===== KEYBOARD SHORTCUT ===== */
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); drawPlot(); }
+});
+
+/* ===== INIT ===== */
+drawPlot();
+</script>
+</body>
+</html>

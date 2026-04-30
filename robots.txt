@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://vijaya-raghavan-k.github.io/pes-maker/sitemap.xml

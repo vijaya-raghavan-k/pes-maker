@@ -2,13 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="google-site-verification" content="phkhDkxNGv_IM7omxyKGsPlFw3SnFGq5MkLaCUG9AxI" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>PES Maker — Potential Energy Surface Diagram Tool</title>
-<meta name="description" content="PES Maker is a simple browser-based tool to draw and export potential energy surface diagrams for reaction pathways.">
-<meta name="robots" content="index, follow">
-<meta name="keywords" content="PES Maker, potential energy surface, reaction energy profile, computational chemistry, chemistry plotting tool, reaction pathway, energy diagram, DFT, transition state, activation energy, vijay, vijaya raghavan, phd, chemistry, mechanism">
-<link rel="canonical" href="https://vijaya-raghavan-k.github.io/pes-maker/">
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
@@ -200,26 +195,22 @@ tr:last-child td{border-bottom:none}
     <!-- DATA TAB -->
     <div class="tab-content active" id="tab-data">
       <label>Pathway data</label>
-      <textarea id="dataInput" class="data-area" spellcheck="false"># pathway, step, label, energy (kcal/mol), [options]
-Main, 1, R, 0.00
-Main, 2, TS1, 32.40
-Main, 3, INT1, -5.20, #E 10
-Main, 4, TS2, 41.70
-Main, 5, P, -12.30
+      <textarea id="dataInput" class="data-area" spellcheck="false"># Exceptional case: Curve crossing and shifted labels
+Path1, 1, Reactant, 0.00
+Path1, 2, TS1, 25.00, 12@-0.2
+Path1, 3, Intermediate, 10.00
+Path1, 4, TS2, 30.00
+Path1, 5, Product, -5.00
 
-Alt-A, 1, R, 0.00
-Alt-A, 2, TS1a, 28.60
-Alt-A, 3, INT-A, -8.10
-Alt-A, 4, TS2a, 35.50
-Alt-A, 5, P-A, -20.40
-
-Alt-B, 1, R, 0.00
-Alt-B, 2, TS1b, 38.20
-Alt-B, 3, INT-B, 2.30
-Alt-B, 4, P-B, -4.70</textarea>
+Path2, 1, Reactant*, 40.00
+Path2, 2, Crossing, 25.00, 10@0.25
+Path2, 3, Intermediate*, 15.00, #E
+Path2, 4, TS2*, 45.00, @0.2
+Path2, 5, Product*, 5.00</textarea>
       
       <div class="hint">Columns: pathway, step, label, energy, [options].<br>
-      Options (5th col): <code>#L</code> hides label, <code>#E</code> hides energy, numbers shift label Y-position (e.g., <code>10</code>).</div>
+      Options (5th col): <code>#L</code> (hide label), <code>#E</code> (hide energy).<br>
+      Use <code>Y@X</code> to shift labels (e.g. <code>9</code> for vertical up, <code>9@3</code> for vertical up & horizontal right, <code>@-0.2</code> for horizontal left only).</div>
 
       <label>Quick-load presets</label>
       <div class="preset-chips">
@@ -256,15 +247,43 @@ Alt-B, 4, P-B, -4.70</textarea>
     <!-- STYLE TAB -->
     <div class="tab-content" id="tab-style">
       <div class="row">
-        <div><label>Plot title</label><input id="plotTitle" value="Multi-pathway PES diagram"></div>
-        <div><label>Y-axis label</label><input id="yLabel" value="Relative energy (kcal mol⁻¹)"></div>
-      </div>
-      <div class="row">
+        <div><label>Plot title</label><input id="plotTitle" value="Potential Energy Surface Diagram"></div>
         <div><label>Diagram style</label>
           <select id="diagramStyle"><option value="levels">Energy levels</option><option value="points">Point-to-point</option></select>
         </div>
+      </div>
+      <div class="row">
+        <div><label>X-axis label</label><input id="xLabel" value="Reaction coordinate"></div>
+        <div><label>Y-axis label</label><input id="yLabel" value="Relative energy (kcal mol⁻¹)"></div>
+      </div>
+      <div class="row">
+        <div><label>X-axis visibility</label>
+          <select id="xAxisChoice"><option value="show">Visible</option><option value="hide">Hidden</option></select>
+        </div>
+        <div><label>Y-axis visibility</label>
+          <select id="yAxisChoice"><option value="show">Visible</option><option value="hide">Hidden</option></select>
+        </div>
+      </div>
+      <div class="row">
         <div><label>Connector style</label>
           <select id="lineShape"><option value="spline">Smooth curve</option><option value="linear">Straight</option><option value="hv">Step-like</option></select>
+        </div>
+        <div><label>Connector pattern</label>
+          <select id="connectorDash">
+            <option value="auto">Auto (Solid/Dot)</option>
+            <option value="solid">All Solid</option>
+            <option value="dash">All Dashed</option>
+            <option value="dot">All Dotted</option>
+            <option value="dashdot">All Dash-Dot</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div><label>Plot bounding box</label>
+          <select id="boxBorderChoice"><option value="hide">Off</option><option value="show">On</option></select>
+        </div>
+        <div><label>Legend box border</label>
+          <select id="legendBorderChoice"><option value="hide">Off</option><option value="show">On</option></select>
         </div>
       </div>
       <div class="row">
@@ -276,8 +295,8 @@ Alt-B, 4, P-B, -4.70</textarea>
         </div>
       </div>
       <div class="row">
-        <div><label>X-axis</label>
-          <select id="xAxisChoice"><option value="hide">Hidden</option><option value="show">Visible</option></select>
+        <div><label>Level markers</label>
+          <select id="showMarkersChoice"><option value="hide">Hidden</option><option value="show">Visible</option></select>
         </div>
         <div><label>Species labels</label>
           <select id="labelChoice"><option value="all">Label + energy</option><option value="name">Label only</option><option value="energy">Energy only</option><option value="none">None</option></select>
@@ -350,9 +369,8 @@ Alt-B, 4, P-B, -4.70</textarea>
         </div>
       </div>
       <label>Custom colors <span style="font-weight:400;text-transform:none;letter-spacing:0">(pathway, #hex)</span></label>
-      <textarea id="colorInput" class="color-area" spellcheck="false">Main, #1a1a1a
-Alt-A, #b91c1c
-Alt-B, #166534</textarea>
+      <textarea id="colorInput" class="color-area" spellcheck="false">Path1, #1a1a1a
+Path2, #b91c1c</textarea>
 
       <div class="action-grid">
         <button class="btn btn-primary action-full" onclick="drawPlot()">⟶ &nbsp;Redraw</button>
@@ -370,7 +388,7 @@ Alt-B, #166534</textarea>
       <div class="hint" style="margin-top:0;margin-bottom:12px">Draw vertical energy difference arrows between two steps. Use X-Offset to manually nudge the line left or right (e.g. <code>0.2</code>).</div>
       <div id="barrierList"></div>
       <div class="row" style="margin-top:10px">
-        <div><input id="barrierPath" value="Main" placeholder="Pathway"></div>
+        <div><input id="barrierPath" value="Path1" placeholder="Pathway"></div>
         <div style="display:flex;gap:6px">
           <input id="barrierFrom" type="number" value="1" min="1" placeholder="From" title="From step">
           <input id="barrierTo" type="number" value="2" min="1" placeholder="To" title="To step">
@@ -479,9 +497,16 @@ Alt-B, #166534</textarea>
       <ul>
         <li><code>#L</code> : Hides the text label.</li>
         <li><code>#E</code> : Hides the numerical energy value.</li>
-        <li><strong>Number</strong> : Any bare number (e.g., <code>10</code> or <code>-5</code>) will vertically shift the label by that energy amount relative to the current position.</li>
+        <li><strong>Number@Number</strong> : Adjusts vertical and horizontal positions of labels independently. 
+            Format is <code>Y@X</code> where <code>Y</code> shifts vertical energy amount and <code>X</code> shifts horizontal steps. 
+            <ul>
+                <li><code>10</code> : Shifts label UP by 10 energy units.</li>
+                <li><code>10@0.2</code> : Shifts label UP by 10 units AND RIGHT by 0.2 steps.</li>
+                <li><code>@-0.3</code> : Shifts label LEFT by 0.3 steps (no vertical shift).</li>
+            </ul>
+        </li>
       </ul>
-      <div class="hint" style="margin-top:0">Example: <code>Main, 3, INT1, -5.20, #E 10</code><br>This hides the energy number and shifts the "INT1" label UP by 10 energy units.</div>
+      <div class="hint" style="margin-top:0">Example: <code>Path1, 3, INT1, -5.20, #E 10@0.2</code><br>This hides the energy number and shifts the "INT1" label UP and slightly RIGHT.</div>
 
       <h3 style="margin-top:24px">Subscripts & Superscripts</h3>
       <p>You can easily format chemical formulas or transition state symbols in both the Data Tab and Custom Annotations Tab:</p>
@@ -493,9 +518,6 @@ Alt-B, #166534</textarea>
       <h3 style="margin-top:24px">Barriers & Annotations</h3>
       <p><strong>Barrier Markers</strong> calculate the exact energy difference (Final minus Initial) between two steps on the same pathway. If you need to stop overlapping elements, use the <strong>X-Offset</strong> input to manually nudge the barrier left (e.g., <code>-0.2</code>) or right (e.g., <code>0.2</code>).</p>
       <p><strong>Custom Annotations</strong> allow you to place free-floating text or arrows anywhere on the canvas using X and Y coordinates that map directly to the plot axes.</p>
-
-      <h3 style="margin-top:24px">Runscripts</h3>
-      <p>The <strong>Script</strong> tab generates a plain-text representation of your entire diagram—including data, visual styles, custom colors, annotations, and barriers. You can save this text file locally to easily reproduce or share your exact plot later.</p>
     </div>
 
     <div class="footer">
@@ -583,7 +605,8 @@ function parseData() {
       // Default 5th column options
       let hideLabel = false;
       let hideEnergy = false;
-      let shift = 0;
+      let shiftY = 0;
+      let shiftX = 0;
 
       if (p.length >= 5 && p[4]) {
         const opts = p[4].split(/\s+/);
@@ -591,12 +614,17 @@ function parseData() {
           const upperOpt = opt.toUpperCase();
           if (upperOpt === '#L') hideLabel = true;
           else if (upperOpt === '#E') hideEnergy = true;
-          else if (!isNaN(parseFloat(opt))) shift = parseFloat(opt);
+          else if (opt.includes('@')) {
+              const parts = opt.split('@');
+              if (parts[0] !== '' && !isNaN(parseFloat(parts[0]))) shiftY = parseFloat(parts[0]);
+              if (parts[1] !== '' && !isNaN(parseFloat(parts[1]))) shiftX = parseFloat(parts[1]);
+          }
+          else if (!isNaN(parseFloat(opt))) shiftY = parseFloat(opt);
         });
       }
 
       if (Number.isFinite(step) && Number.isFinite(e)) {
-        data.push({ path: p[0], step, label: p[2], energyRaw: e, row: i + 1, hideLabel, hideEnergy, shift });
+        data.push({ path: p[0], step, label: p[2], energyRaw: e, row: i + 1, hideLabel, hideEnergy, shiftY, shiftX });
       }
     }
   });
@@ -631,15 +659,12 @@ function labelText(d) {
 }
 
 /* ===== SUB/SUPERSCRIPT ===== */
-// Converts _{...} → <sub>...</sub> and ^{...} → <sup>...</sup>
-// Works in labels, annotations, barrier text, titles
 function texToHtml(str) {
   if (!str) return str;
   return str
     .replace(/\_\{([^}]*)\}/g, '<sub>$1</sub>')
     .replace(/\^\{([^}]*)\}/g, '<sup>$1</sup>');
 }
-// Reverse: <sub>...</sub> → _{...} and <sup>...</sup> → ^{...}
 function htmlToTex(str) {
   if (!str) return str;
   return str
@@ -693,16 +718,21 @@ function connectorTrace(x1, y1, x2, y2, color, dash, name, showLegend, shape, cw
 function getLegendConfig() {
   const pos = document.getElementById('legendPosition')?.value || 'bottom-h';
   const axisFontSize = Number(document.getElementById('axisFontSize').value) || 13;
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const showLegendBorder = document.getElementById('legendBorderChoice')?.value === 'show';
+  const legendBorderWidth = showLegendBorder ? 1 : 0;
+  const legendBorderColor = isDark ? '#4b5563' : '#d1d5db';
+
   switch(pos) {
-    case 'bottom-h': return { show: true, orientation: 'h', x: 0.5, xanchor: 'center', y: -0.15, yanchor: 'top', font: { size: axisFontSize - 1 } };
-    case 'bottom-v': return { show: true, orientation: 'v', x: 0.5, xanchor: 'center', y: -0.15, yanchor: 'top', font: { size: axisFontSize - 1 } };
-    case 'top-right': return { show: true, orientation: 'v', x: 1, xanchor: 'right', y: 1, yanchor: 'top', font: { size: axisFontSize - 1 } };
-    case 'top-left': return { show: true, orientation: 'v', x: 0, xanchor: 'left', y: 1, yanchor: 'top', font: { size: axisFontSize - 1 } };
-    case 'right': return { show: true, orientation: 'v', x: 1.02, xanchor: 'left', y: 0.5, yanchor: 'middle', font: { size: axisFontSize - 1 } };
-    case 'inside-top-right': return { show: true, orientation: 'v', x: 0.98, xanchor: 'right', y: 0.98, yanchor: 'top', bgcolor: 'rgba(255,255,255,0.7)', bordercolor: 'rgba(0,0,0,0.1)', borderwidth: 1, font: { size: axisFontSize - 1 } };
-    case 'inside-top-left': return { show: true, orientation: 'v', x: 0.02, xanchor: 'left', y: 0.98, yanchor: 'top', bgcolor: 'rgba(255,255,255,0.7)', bordercolor: 'rgba(0,0,0,0.1)', borderwidth: 1, font: { size: axisFontSize - 1 } };
+    case 'bottom-h': return { show: true, orientation: 'h', x: 0.5, xanchor: 'center', y: -0.15, yanchor: 'top', font: { size: axisFontSize - 1 }, borderwidth: legendBorderWidth, bordercolor: legendBorderColor };
+    case 'bottom-v': return { show: true, orientation: 'v', x: 0.5, xanchor: 'center', y: -0.15, yanchor: 'top', font: { size: axisFontSize - 1 }, borderwidth: legendBorderWidth, bordercolor: legendBorderColor };
+    case 'top-right': return { show: true, orientation: 'v', x: 1, xanchor: 'right', y: 1, yanchor: 'top', font: { size: axisFontSize - 1 }, borderwidth: legendBorderWidth, bordercolor: legendBorderColor };
+    case 'top-left': return { show: true, orientation: 'v', x: 0, xanchor: 'left', y: 1, yanchor: 'top', font: { size: axisFontSize - 1 }, borderwidth: legendBorderWidth, bordercolor: legendBorderColor };
+    case 'right': return { show: true, orientation: 'v', x: 1.02, xanchor: 'left', y: 0.5, yanchor: 'middle', font: { size: axisFontSize - 1 }, borderwidth: legendBorderWidth, bordercolor: legendBorderColor };
+    case 'inside-top-right': return { show: true, orientation: 'v', x: 0.98, xanchor: 'right', y: 0.98, yanchor: 'top', bgcolor: isDark ? 'rgba(17,24,39,0.8)' : 'rgba(255,255,255,0.8)', bordercolor: legendBorderColor, borderwidth: showLegendBorder ? 1 : 0, font: { size: axisFontSize - 1 } };
+    case 'inside-top-left': return { show: true, orientation: 'v', x: 0.02, xanchor: 'left', y: 0.98, yanchor: 'top', bgcolor: isDark ? 'rgba(17,24,39,0.8)' : 'rgba(255,255,255,0.8)', bordercolor: legendBorderColor, borderwidth: showLegendBorder ? 1 : 0, font: { size: axisFontSize - 1 } };
     case 'none': return { show: false };
-    default: return { show: true, orientation: 'h', x: 0.5, xanchor: 'center', y: -0.15, yanchor: 'top', font: { size: axisFontSize - 1 } };
+    default: return { show: true, orientation: 'h', x: 0.5, xanchor: 'center', y: -0.15, yanchor: 'top', font: { size: axisFontSize - 1 }, borderwidth: legendBorderWidth, bordercolor: legendBorderColor };
   }
 }
 
@@ -717,6 +747,7 @@ function drawPlot() {
   const groups = grouped(data);
   const style = document.getElementById('diagramStyle').value;
   const shape = document.getElementById('lineShape').value;
+  const connectorDashPref = document.getElementById('connectorDash')?.value || 'auto';
   const width = Number(document.getElementById('levelWidth').value) || 0.45;
   const cw = Number(document.getElementById('connectorWidth').value) || 1.5;
   const lt = Number(document.getElementById('levelThickness').value) || 3;
@@ -727,25 +758,35 @@ function drawPlot() {
   const alignMode = document.getElementById('stepAlign')?.value || 'vertical';
   const gap = alignMode === 'offset' ? 0.18 : 0;
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const showMarkers = document.getElementById('showMarkersChoice')?.value === 'show';
   const traces = [];
   const annotations = [];
 
   groups.forEach(([name, pts], gi) => {
     const color = getPathColor(name, gi);
     const offset = (gi - (groups.length - 1) / 2) * gap;
-    const dash = gi === 0 ? 'solid' : 'dot';
+    
+    // Connector Dash style resolution
+    const dash = connectorDashPref === 'auto' ? (gi === 0 ? 'solid' : 'dot') : connectorDashPref;
 
     if (style === 'levels') {
       pts.forEach(d => {
         const x = d.step + offset;
         traces.push({ x: [x - width / 2, x + width / 2], y: [d.energy, d.energy], mode: 'lines', type: 'scatter', line: { color, width: lt }, showlegend: false, hoverinfo: 'skip' });
+        
+        // Optional marker points on the energy level center
+        if (showMarkers) {
+          traces.push({ x: [x], y: [d.energy], mode: 'markers', type: 'scatter', marker: { size: 6, color }, showlegend: false, hoverinfo: 'skip' });
+        }
+
         const txt = labelText(d);
         if (txt) {
-          // Fixed shift logic: Use 5th column exact coordinate if provided, otherwise default to a strict 20px padding upward.
-          const yPos = d.shift !== 0 ? d.energy + d.shift : d.energy;
-          const pixShift = d.shift !== 0 ? 0 : 20; 
+          // X-Y Shift logic
+          const xPos = d.shiftX !== 0 ? x + d.shiftX : x;
+          const yPos = d.shiftY !== 0 ? d.energy + d.shiftY : d.energy;
+          const pixShift = d.shiftY !== 0 ? 0 : 20; 
           
-          annotations.push({ x, y: yPos, text: txt, showarrow: false, yshift: pixShift, font: { color, size: fontSize, family: fontFamily }, align: 'center' });
+          annotations.push({ x: xPos, y: yPos, text: txt, showarrow: false, yshift: pixShift, font: { color, size: fontSize, family: fontFamily }, align: 'center' });
         }
       });
       for (let i = 0; i < pts.length - 1; i++) {
@@ -753,8 +794,29 @@ function drawPlot() {
         traces.push(connectorTrace(a.step + offset + width / 2, a.energy, b.step + offset - width / 2, b.energy, color, dash, name, i === 0, shape, cw));
       }
     } else {
+      // Point-to-point uses annotations exclusively for text to support X/Y shifts
       const plotlyShape = shape === 'hv' ? 'hv' : shape === 'spline' ? 'spline' : 'linear';
-      traces.push({ x: pts.map(d => d.step + offset), y: pts.map(d => d.energy), mode: 'lines+markers+text', type: 'scatter', name, line: { color, width: 2, shape: plotlyShape, smoothing: 1.2 }, marker: { size: 8, color }, text: pts.map(labelText), textposition: 'top center', textfont: { size: fontSize, family: fontFamily }, hovertemplate: `${name}<br>%{text}<extra></extra>` });
+      traces.push({ 
+        x: pts.map(d => d.step + offset), 
+        y: pts.map(d => d.energy), 
+        mode: 'lines+markers', 
+        type: 'scatter', 
+        name, 
+        line: { color, width: cw, shape: plotlyShape, smoothing: 1.2, dash }, 
+        marker: { size: 8, color }, 
+        hovertemplate: `${name}<extra></extra>` 
+      });
+
+      pts.forEach(d => {
+        const x = d.step + offset;
+        const txt = labelText(d);
+        if (txt) {
+          const xPos = d.shiftX !== 0 ? x + d.shiftX : x;
+          const yPos = d.shiftY !== 0 ? d.energy + d.shiftY : d.energy;
+          const pixShift = d.shiftY !== 0 ? 0 : 15;
+          annotations.push({ x: xPos, y: yPos, text: txt, showarrow: false, yshift: pixShift, font: { color, size: fontSize, family: fontFamily }, align: 'center' });
+        }
+      });
     }
   });
 
@@ -776,30 +838,23 @@ function drawPlot() {
     const to = grp[1].find(d => d.step === bm.to);
     if (!from || !to) return;
     
-    // Apply optional manual X-Offset
     const offsetX = bm.offsetX || 0;
     const x = (from.step + to.step) / 2 + 0.55 + offsetX;
     
-    // Calculate barrier as Final minus Initial (allows negative values)
     const diff = (to.energy - from.energy).toFixed(1);
-    
     const bmDash = bm.style || 'dash';
     const lineColor = isDark ? '#888' : '#555';
-    // Build label text
+    
     let rawLabel = bm.labelType || 'ΔE^{‡}';
     if (rawLabel === 'custom') rawLabel = bm.customText || '';
     const labelHtml = texToHtml(rawLabel) + ' = ' + diff;
-    // Text side offset
     const side = bm.textSide || 'right';
     const xShift = side === 'left' ? -12 : 12;
     const xAnchor = side === 'left' ? 'right' : 'left';
 
-    // Vertical line
     traces.push({ x: [x, x], y: [from.energy, to.energy], mode: 'lines', type: 'scatter', line: { color: lineColor, width: 1.2, dash: bmDash }, showlegend: false, hoverinfo: 'skip' });
-    // Arrowheads
     annotations.push({ x, y: to.energy, ax: 0, ay: to.energy > from.energy ? 10 : -10, text: '', showarrow: true, arrowhead: 3, arrowsize: 0.8, arrowwidth: 1.2, arrowcolor: lineColor });
     annotations.push({ x, y: from.energy, ax: 0, ay: from.energy > to.energy ? 10 : -10, text: '', showarrow: true, arrowhead: 3, arrowsize: 0.8, arrowwidth: 1.2, arrowcolor: lineColor });
-    // Label
     annotations.push({ x, y: (from.energy + to.energy) / 2, text: labelHtml, showarrow: false, xshift: xShift, xanchor: xAnchor, font: { size: fontSize, color: isDark ? '#ccc' : '#333', family: fontFamily } });
   });
 
@@ -807,7 +862,10 @@ function drawPlot() {
   const minStep = Math.min(...allSteps), maxStep = Math.max(...allSteps);
   const grid = document.getElementById('gridChoice').value;
   const showX = document.getElementById('xAxisChoice').value === 'show';
+  const showY = document.getElementById('yAxisChoice')?.value !== 'hide'; // Default to show if missing
   const showZero = document.getElementById('zeroLineChoice').value === 'show';
+  const boxBorder = document.getElementById('boxBorderChoice')?.value === 'show';
+  
   const plotBg = isDark ? '#111827' : '#ffffff';
   const paperBg = isDark ? '#111827' : '#ffffff';
   const gridColor = isDark
@@ -817,6 +875,9 @@ function drawPlot() {
   const legendCfg = getLegendConfig();
   const rightMargin = (legendCfg.show && document.getElementById('legendPosition')?.value === 'right') ? 120 : 35;
 
+  const xLabel = document.getElementById('xLabel')?.value || 'Reaction step';
+  const yLabel = document.getElementById('yLabel')?.value || 'Relative energy (kcal mol⁻¹)';
+
   const layout = {
     title: { text: texToHtml(document.getElementById('plotTitle').value), font: { size: titleFontSize, family: fontFamily, color: fontColor } },
     font: { family: fontFamily, color: fontColor },
@@ -825,8 +886,32 @@ function drawPlot() {
     showlegend: legendCfg.show,
     legend: { orientation: legendCfg.orientation, x: legendCfg.x, xanchor: legendCfg.xanchor, y: legendCfg.y, yanchor: legendCfg.yanchor, font: { size: legendCfg.font?.size || 12, family: fontFamily }, bgcolor: legendCfg.bgcolor, bordercolor: legendCfg.bordercolor, borderwidth: legendCfg.borderwidth },
     annotations,
-    xaxis: { title: showX ? { text: 'Reaction step', font: { size: axisFontSize } } : '', range: [minStep - 0.8, maxStep + 0.8], showticklabels: showX, showline: showX, zeroline: false, showgrid: grid === 'full', gridcolor: gridColor, dtick: 1, tickfont: { size: axisFontSize - 1 } },
-    yaxis: { title: { text: texToHtml(document.getElementById('yLabel').value), font: { size: axisFontSize } }, zeroline: showZero, zerolinewidth: 1.5, zerolinecolor: isDark ? 'rgba(255,255,255,.2)' : 'rgba(0,0,0,.25)', showgrid: grid !== 'off', gridcolor: gridColor, tickfont: { size: axisFontSize - 1 } }
+    xaxis: { 
+      title: showX ? { text: texToHtml(xLabel), font: { size: axisFontSize } } : '', 
+      range: [minStep - 0.8, maxStep + 0.8], 
+      showticklabels: showX, 
+      showline: showX || boxBorder, 
+      linecolor: gridColor,
+      mirror: boxBorder ? 'allTicks' : false,
+      zeroline: false, 
+      showgrid: grid === 'full', 
+      gridcolor: gridColor, 
+      dtick: 1, 
+      tickfont: { size: axisFontSize - 1 } 
+    },
+    yaxis: { 
+      title: showY ? { text: texToHtml(yLabel), font: { size: axisFontSize } } : '', 
+      showticklabels: showY,
+      showline: showY || boxBorder,
+      linecolor: gridColor,
+      mirror: boxBorder ? 'allTicks' : false,
+      zeroline: showZero, 
+      zerolinewidth: 1.5, 
+      zerolinecolor: isDark ? 'rgba(255,255,255,.2)' : 'rgba(0,0,0,.25)', 
+      showgrid: grid !== 'off', 
+      gridcolor: gridColor, 
+      tickfont: { size: axisFontSize - 1 } 
+    }
   };
 
   Plotly.newPlot('plot', traces, layout, { responsive: true, displaylogo: false, modeBarButtonsToRemove: ['lasso2d', 'select2d'] });
@@ -887,7 +972,6 @@ function addBarrierMarker() {
   const offsetX = parseFloat(document.getElementById('barrierOffsetX')?.value) || 0;
   
   if (path && Number.isFinite(from) && Number.isFinite(to)) {
-    // Validation check to prevent phantom barriers
     const pathData = lastParsed.filter(d => d.path === path);
     if (!pathData.length) { toast(`Error: Pathway '${path}' not found`); return; }
     
@@ -941,7 +1025,7 @@ SN2, 3, Products, -8.20`,
   multi: `# Multi-path PES
 Main, 1, R, 0.00
 Main, 2, TS1, 32.40
-Main, 3, INT1, -5.20, #E 10
+Main, 3, INT1, -5.20, 10
 Main, 4, TS2, 41.70
 Main, 5, P, -12.30
 
@@ -993,10 +1077,8 @@ function downloadImage(format) {
   const bg = document.getElementById('exportBg').value;
 
   if (bg === 'transparent') {
-    // Temporarily set transparent bg for export
     Plotly.relayout('plot', { plot_bgcolor: 'rgba(0,0,0,0)', paper_bgcolor: 'rgba(0,0,0,0)' }).then(() => {
       Plotly.downloadImage('plot', { format, filename: `pes_diagram.${format}`, width: w, height: h, scale: s });
-      // Restore original bg after a short delay
       setTimeout(() => drawPlot(), 500);
     });
   } else {
@@ -1077,9 +1159,11 @@ function generateScript() {
   lines.push('  Style');
   const styleKeys = [
     ['PlotTitle', 'plotTitle'],
+    ['XLabel', 'xLabel'],
     ['YLabel', 'yLabel'],
     ['DiagramStyle', 'diagramStyle'],
     ['LineShape', 'lineShape'],
+    ['ConnectorDash', 'connectorDash'],
     ['FontFamily', 'fontFamily'],
     ['TitleFontSize', 'titleFontSize'],
     ['LabelFontSize', 'labelFontSize'],
@@ -1090,6 +1174,10 @@ function generateScript() {
     ['GridChoice', 'gridChoice'],
     ['ZeroLine', 'zeroLineChoice'],
     ['XAxis', 'xAxisChoice'],
+    ['YAxis', 'yAxisChoice'],
+    ['BoxBorder', 'boxBorderChoice'],
+    ['LegendBorder', 'legendBorderChoice'],
+    ['ShowMarkers', 'showMarkersChoice'],
     ['LabelChoice', 'labelChoice'],
     ['EnergyMode', 'energyMode'],
     ['StepAlign', 'stepAlign'],
@@ -1148,12 +1236,10 @@ function loadScript() {
   const text = document.getElementById('scriptEditor').value.trim();
   if (!text) { toast('Script editor is empty'); return; }
 
-  // Check wrapper (accepts both new and old format)
   if (!text.startsWith('PESMaker Input') && !text.startsWith('PESArchitect Input')) { 
     toast('Invalid script: must start with "PESMaker Input"'); return; 
   }
 
-  // Extract blocks
   function extractBlock(name) {
     const re = new RegExp('^\\s*' + name + '\\s*$', 'im');
     const endRe = /^\s*End\s*$/im;
@@ -1167,13 +1253,11 @@ function loadScript() {
     return result;
   }
 
-  // Parse Data
   const dataLines = extractBlock('Data');
   if (dataLines.length) {
     document.getElementById('dataInput').value = dataLines.map(l => l.trim()).filter(Boolean).join('\n');
   }
 
-  // Parse Style
   const styleLines = extractBlock('Style');
   const styleMap = {};
   styleLines.forEach(line => {
@@ -1188,9 +1272,11 @@ function loadScript() {
 
   const setVal = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.value = val; };
   setVal('plotTitle', styleMap['PlotTitle']);
+  setVal('xLabel', styleMap['XLabel']);
   setVal('yLabel', styleMap['YLabel']);
   setVal('diagramStyle', styleMap['DiagramStyle']);
   setVal('lineShape', styleMap['LineShape']);
+  setVal('connectorDash', styleMap['ConnectorDash']);
   setVal('fontFamily', styleMap['FontFamily']);
   setVal('titleFontSize', styleMap['TitleFontSize']);
   setVal('labelFontSize', styleMap['LabelFontSize']);
@@ -1201,6 +1287,10 @@ function loadScript() {
   setVal('gridChoice', styleMap['GridChoice']);
   setVal('zeroLineChoice', styleMap['ZeroLine']);
   setVal('xAxisChoice', styleMap['XAxis']);
+  setVal('yAxisChoice', styleMap['YAxis']);
+  setVal('boxBorderChoice', styleMap['BoxBorder']);
+  setVal('legendBorderChoice', styleMap['LegendBorder']);
+  setVal('showMarkersChoice', styleMap['ShowMarkers']);
   setVal('labelChoice', styleMap['LabelChoice']);
   setVal('energyMode', styleMap['EnergyMode']);
   setVal('stepAlign', styleMap['StepAlign']);
@@ -1208,13 +1298,11 @@ function loadScript() {
   setVal('paletteChoice', styleMap['Palette']);
   setVal('legendPosition', styleMap['LegendPosition']);
 
-  // Parse CustomColors
   const colorLines = extractBlock('CustomColors');
   if (colorLines.length) {
     document.getElementById('colorInput').value = colorLines.map(l => l.trim()).filter(Boolean).join('\n');
   }
 
-  // Parse Annotations
   const annoLines = extractBlock('Annotations');
   customAnnotations = [];
   annoLines.forEach(line => {
@@ -1238,13 +1326,11 @@ function loadScript() {
   });
   renderAnnoList();
 
-  // Parse Barriers
   const barrierLines = extractBlock('Barriers');
   barrierMarkers = [];
   barrierLines.forEach(line => {
     const t = line.trim();
     if (!t || t.startsWith('#')) return;
-    // Handle quoted custom text: pathway, from, to, style, "custom text", side, offsetX
     const quotedMatch = t.match(/^([^,]+),\s*(\d+),\s*(\d+),\s*(\w+),\s*"([^"]*)",\s*(\w+)(?:,\s*(-?[\d.]+))?/);
     if (quotedMatch) {
       barrierMarkers.push({
@@ -1259,7 +1345,6 @@ function loadScript() {
       });
       return;
     }
-    // Non-quoted: pathway, from, to, style, labelType, side, offsetX
     const parts = t.split(/[,;\t]+/).map(s => s.trim());
     if (parts.length >= 3) {
       barrierMarkers.push({
@@ -1276,7 +1361,6 @@ function loadScript() {
   });
   renderBarrierList();
 
-  // Draw
   drawPlot();
   toast('Script loaded — diagram redrawn');
 }

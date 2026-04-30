@@ -14,141 +14,162 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
 <style>
 :root {
-  --bg: #f4f3ef;
+  --bg: #f3f4f6;
   --surface: #ffffff;
-  --surface2: #f9f8f5;
-  --text: #1a1a1a;
-  --text2: #5c5c5c;
-  --text3: #999;
-  --border: #e0ded8;
-  --accent: #1d4ed8;
+  --surface2: #f9fafb;
+  --text: #111827;
+  --text2: #4b5563;
+  --text3: #9ca3af;
+  --border: #e5e7eb;
+  --accent: #2563eb;
   --accent-light: #dbeafe;
-  --danger: #b91c1c;
-  --good: #166534;
+  --danger: #dc2626;
+  --danger-light: #fef2f2;
+  --good: #16a34a;
   --good-light: #dcfce7;
-  --shadow: 0 1px 3px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.06);
-  --radius: 10px;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --radius: 12px;
+  --input-radius: 8px;
   --mono: 'JetBrains Mono', 'Consolas', monospace;
   --sans: 'DM Sans', system-ui, sans-serif;
-  --header-bg: #1a1a1a;
-  --header-text: #f4f3ef;
+  --header-bg: #111827;
+  --header-text: #f9fafb;
   --tab-active: var(--accent);
   --tab-inactive: transparent;
-  --input-bg: #fff;
-  --tag-bg: #e8e6e1;
+  --input-bg: #ffffff;
+  --tag-bg: #f3f4f6;
 }
 [data-theme="dark"] {
-  --bg: #111113;
-  --surface: #1c1c1f;
-  --surface2: #232326;
-  --text: #e4e4e7;
-  --text2: #a1a1aa;
-  --text3: #5c5c66;
-  --border: #2e2e33;
-  --accent: #60a5fa;
-  --accent-light: #1e3a5f;
+  --bg: #030712;
+  --surface: #111827;
+  --surface2: #1f2937;
+  --text: #f9fafb;
+  --text2: #9ca3af;
+  --text3: #6b7280;
+  --border: #374151;
+  --accent: #3b82f6;
+  --accent-light: #1e3a8a;
   --danger: #ef4444;
-  --good: #34d399;
+  --danger-light: #7f1d1d;
+  --good: #10b981;
   --good-light: #064e3b;
-  --shadow: 0 1px 3px rgba(0,0,0,.2), 0 8px 24px rgba(0,0,0,.25);
-  --header-bg: #09090b;
-  --header-text: #e4e4e7;
-  --input-bg: #232326;
-  --tag-bg: #2e2e33;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  --header-bg: #030712;
+  --header-text: #f9fafb;
+  --input-bg: #1f2937;
+  --tag-bg: #374151;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{font-size:14px}
-body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;display:flex;flex-direction:column}
 
 /* === HEADER === */
 .header{background:var(--header-bg);color:var(--header-text);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(255,255,255,.06)}
 .header-left{display:flex;align-items:center;gap:14px}
-.logo{width:48px;height:32px;border-radius:6px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:white;letter-spacing:-.5px}
-.header h1{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.logo{width:36px;height:36px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:white;letter-spacing:-.5px;box-shadow:var(--shadow-sm)}
+.header h1{font-size:18px;font-weight:700;letter-spacing:-.3px}
 .header-right{display:flex;gap:8px;align-items:center}
 .theme-toggle{background:none;border:1px solid rgba(255,255,255,.15);border-radius:8px;color:var(--header-text);padding:6px 10px;cursor:pointer;font-size:15px;display:flex;align-items:center;transition:.2s}
-.theme-toggle:hover{background:rgba(255,255,255,.08)}
+.theme-toggle:hover{background:rgba(255,255,255,.1)}
 
 /* === LAYOUT === */
-.app{display:grid;grid-template-columns:400px 1fr;gap:0;min-height:calc(100vh - 56px)}
-.sidebar{background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;max-height:calc(100vh - 56px);position:sticky;top:56px}
-.plot-area{padding:20px;display:flex;flex-direction:column;gap:16px;overflow:hidden}
+.app{display:grid;grid-template-columns:420px 1fr;gap:0;flex:1}
+.sidebar{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;height:calc(100vh - 65px);position:sticky;top:65px}
+.plot-area{padding:24px;display:flex;flex-direction:column;gap:16px;overflow:hidden;background:var(--bg)}
 
-/* === SIDEBAR === */
-.tabs{display:flex;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:10}
-.tab{flex:1;padding:11px 8px;text-align:center;font-size:12px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;cursor:pointer;border-bottom:2px solid transparent;color:var(--text2);transition:.15s;background:none;border-top:none;border-left:none;border-right:none}
+/* === TABS === */
+.tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface);z-index:10;padding:0 8px;flex-shrink:0}
+.tab{flex:1;padding:14px 4px;text-align:center;font-size:11.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;cursor:pointer;border-bottom:3px solid transparent;color:var(--text2);transition:.2s;background:none;border-top:none;border-left:none;border-right:none}
 .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
-.tab:hover{color:var(--text)}
-.tab-content{display:none;padding:16px}
+.tab:hover:not(.active){color:var(--text)}
+.tab-content{display:none;padding:20px;overflow-y:auto;flex:1}
 .tab-content.active{display:block}
 
-label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);margin:14px 0 5px}
+/* === INPUTS === */
+label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text2);margin:16px 0 6px}
 label:first-child{margin-top:0}
-textarea,input,select{width:100%;border:1px solid var(--border);border-radius:var(--radius);padding:9px 11px;font-size:13px;background:var(--input-bg);color:var(--text);font-family:var(--sans);transition:.15s}
-textarea{font-family:var(--mono);font-size:12px;line-height:1.55;resize:vertical}
+textarea,input,select{width:100%;border:1px solid var(--border);border-radius:var(--input-radius);padding:10px 12px;font-size:13px;background:var(--input-bg);color:var(--text);font-family:var(--sans);transition:.2s;box-shadow:var(--shadow-sm)}
+textarea{font-family:var(--mono);font-size:12px;line-height:1.6;resize:vertical}
 textarea:focus,input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-light)}
 .data-area{min-height:260px}
 .color-area{min-height:72px}
 
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 
-.hint{font-size:11px;color:var(--text3);margin-top:6px;line-height:1.5}
+.hint{font-size:12px;color:var(--text3);margin-top:8px;line-height:1.5;background:var(--surface2);padding:10px;border-radius:var(--input-radius);border:1px solid var(--border)}
+.hint code{font-family:var(--mono);font-size:11px;background:var(--tag-bg);padding:2px 4px;border-radius:4px;color:var(--text)}
 
 /* === BUTTONS === */
-.btn{border:none;border-radius:var(--radius);padding:9px 14px;font-weight:600;font-size:12.5px;cursor:pointer;font-family:var(--sans);transition:.15s;display:inline-flex;align-items:center;justify-content:center;gap:6px;letter-spacing:.2px}
+.btn{border:none;border-radius:var(--input-radius);padding:10px 16px;font-weight:600;font-size:13px;cursor:pointer;font-family:var(--sans);transition:.2s;display:inline-flex;align-items:center;justify-content:center;gap:6px;letter-spacing:.2px;box-shadow:var(--shadow-sm)}
+.btn:active{transform:translateY(1px)}
 .btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{filter:brightness(1.1)}
-.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-primary:hover{background:var(--accent-light);color:var(--accent)}
+.btn-outline{background:var(--surface);border:1px solid var(--border);color:var(--text)}
 .btn-outline:hover{background:var(--surface2);border-color:var(--text3)}
 .btn-good{background:var(--good);color:#fff}
 .btn-good:hover{filter:brightness(1.1)}
-.btn-danger{background:transparent;border:1px solid var(--danger);color:var(--danger)}
-.btn-danger:hover{background:var(--danger);color:#fff}
-.btn-sm{padding:6px 10px;font-size:11.5px}
+.btn-danger{background:var(--surface);border:1px solid var(--danger);color:var(--danger)}
+.btn-danger:hover{background:var(--danger-light)}
+.btn-sm{padding:7px 12px;font-size:12px}
 
-.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
-.action-full{grid-column:1/-1}
-.export-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+.action-full{grid-column:1/-1;padding:12px}
+.export-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
 
 /* === STATS === */
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
-.stat-card{background:var(--surface2);border-radius:var(--radius);padding:10px 12px;border:1px solid var(--border)}
-.stat-label{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);font-weight:600}
-.stat-value{font-size:16px;font-weight:700;margin-top:2px;font-family:var(--mono)}
-.stat-sub{font-size:10px;color:var(--text2);margin-top:1px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+.stat-card{background:var(--surface2);border-radius:var(--input-radius);padding:12px 14px;border:1px solid var(--border);box-shadow:var(--shadow-sm)}
+.stat-label{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);font-weight:700}
+.stat-value{font-size:18px;font-weight:700;margin-top:4px;font-family:var(--mono)}
+.stat-sub{font-size:11px;color:var(--text2);margin-top:2px}
 
 /* === TABLE === */
-.table-wrap{margin-top:14px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;max-height:260px;overflow-y:auto}
-table{width:100%;border-collapse:collapse;font-size:12px}
-th{background:var(--surface2);font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--text2);font-weight:600;position:sticky;top:0}
-th,td{padding:7px 10px;text-align:right;border-bottom:1px solid var(--border)}
+.table-wrap{margin-top:20px;border:1px solid var(--border);border-radius:var(--input-radius);overflow:hidden;max-height:260px;overflow-y:auto;box-shadow:var(--shadow-sm)}
+table{width:100%;border-collapse:collapse;font-size:12px;background:var(--surface)}
+th{background:var(--surface2);font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--text2);font-weight:700;position:sticky;top:0;padding:10px}
+th,td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--border)}
 th:first-child,td:first-child{text-align:left}
-td{font-family:var(--mono);font-size:11.5px}
+td{font-family:var(--mono);font-size:12px}
 tr:last-child td{border-bottom:none}
 
 /* === ANNOTATION PANEL === */
-.anno-item{display:flex;gap:6px;align-items:center;margin-bottom:6px;padding:6px 8px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)}
-.anno-item input{flex:1;font-size:12px;padding:5px 8px}
-.anno-item .btn{flex-shrink:0}
+.anno-item{display:flex;gap:8px;align-items:center;margin-bottom:8px;padding:8px;background:var(--surface2);border-radius:var(--input-radius);border:1px solid var(--border)}
+.anno-item input{flex:1;font-size:12px;padding:6px 10px;box-shadow:none}
+.anno-item .btn{flex-shrink:0;box-shadow:none}
+
+/* === HELP SECTION === */
+.help-section h3{font-size:14px;font-weight:700;margin:24px 0 10px;color:var(--accent)}
+.help-section h3:first-child{margin-top:0}
+.help-section p{font-size:13px;line-height:1.6;color:var(--text);margin-bottom:10px}
+.help-section ul{margin-left:20px;margin-bottom:10px;font-size:13px;line-height:1.6;color:var(--text)}
+.help-section li{margin-bottom:6px}
+.help-section code{font-family:var(--mono);font-size:12px;background:var(--tag-bg);padding:2px 4px;border-radius:4px;color:var(--accent)}
+
+/* === FOOTER === */
+.footer{text-align:center;padding:16px 20px;font-size:12px;color:var(--text3);border-top:1px solid var(--border);background:var(--surface);flex-shrink:0;line-height:1.6;font-weight:500;letter-spacing:.2px}
+.footer a {color: var(--accent); text-decoration: none; font-weight: 600;}
+.footer a:hover {text-decoration: underline;}
 
 /* === PLOT === */
-#plot{width:100%;flex:1;min-height:620px;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow)}
+#plot{width:100%;flex:1;min-height:640px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
 
 /* === TOAST === */
-.toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:var(--bg);padding:10px 18px;border-radius:var(--radius);font-size:13px;font-weight:500;opacity:0;transform:translateY(12px);transition:.3s;z-index:999;pointer-events:none}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:var(--surface);padding:12px 20px;border-radius:var(--input-radius);font-size:13px;font-weight:600;opacity:0;transform:translateY(12px);transition:.3s;z-index:999;pointer-events:none;box-shadow:var(--shadow)}
 .toast.show{opacity:1;transform:translateY(0)}
 
 /* === PRESETS === */
-.preset-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.chip{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;background:var(--tag-bg);color:var(--text2);cursor:pointer;border:1px solid transparent;transition:.15s}
-.chip:hover{border-color:var(--accent);color:var(--accent)}
+.preset-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.chip{padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;background:var(--tag-bg);color:var(--text2);cursor:pointer;border:1px solid transparent;transition:.2s}
+.chip:hover{border-color:var(--accent);color:var(--accent);background:var(--surface)}
 .chip.active{background:var(--accent-light);color:var(--accent);border-color:var(--accent)}
 
 /* === RESPONSIVE === */
-@media(max-width:960px){
-  .app{grid-template-columns:1fr;grid-template-rows:auto 1fr}
-  .sidebar{max-height:none;position:static;border-right:none;border-bottom:1px solid var(--border)}
+@media(max-width:1024px){
+  .app{grid-template-columns:1fr;grid-template-rows:auto 1fr;height:auto}
+  .sidebar{height:auto;position:static;border-right:none;border-bottom:1px solid var(--border)}
   #plot{min-height:480px}
 }
 </style>
@@ -173,15 +194,16 @@ tr:last-child td{border-bottom:none}
       <button class="tab" data-tab="annotate" onclick="switchTab(this)">Annotate</button>
       <button class="tab" data-tab="script" onclick="switchTab(this)">Script</button>
       <button class="tab" data-tab="export" onclick="switchTab(this)">Export</button>
+      <button class="tab" data-tab="help" onclick="switchTab(this)">Help</button>
     </div>
 
     <!-- DATA TAB -->
     <div class="tab-content active" id="tab-data">
       <label>Pathway data</label>
-      <textarea id="dataInput" class="data-area" spellcheck="false"># pathway, step, label, energy (kcal/mol)
+      <textarea id="dataInput" class="data-area" spellcheck="false"># pathway, step, label, energy (kcal/mol), [options]
 Main, 1, R, 0.00
 Main, 2, TS1, 32.40
-Main, 3, INT1, -5.20
+Main, 3, INT1, -5.20, #E 10
 Main, 4, TS2, 41.70
 Main, 5, P, -12.30
 
@@ -195,7 +217,9 @@ Alt-B, 1, R, 0.00
 Alt-B, 2, TS1b, 38.20
 Alt-B, 3, INT-B, 2.30
 Alt-B, 4, P-B, -4.70</textarea>
-      <div class="hint">Columns: pathway, step, label, energy. Comma / tab / semicolon delimiters. Shared step numbers align species vertically.</div>
+      
+      <div class="hint">Columns: pathway, step, label, energy, [options].<br>
+      Options (5th col): <code>#L</code> hides label, <code>#E</code> hides energy, numbers shift label Y-position (e.g., <code>10</code>).</div>
 
       <label>Quick-load presets</label>
       <div class="preset-chips">
@@ -205,7 +229,7 @@ Alt-B, 4, P-B, -4.70</textarea>
         <span class="chip" onclick="loadPreset('degradation')">Degradation</span>
       </div>
 
-      <div class="row" style="margin-top:14px">
+      <div class="row" style="margin-top:16px">
         <div><label>Energy treatment</label>
           <select id="energyMode"><option value="raw">As given</option><option value="relative">Shift min → 0</option></select>
         </div>
@@ -338,31 +362,57 @@ Alt-B, #166534</textarea>
     <!-- ANNOTATE TAB -->
     <div class="tab-content" id="tab-annotate">
       <label>Custom annotations</label>
-      <div class="hint" style="margin-top:0;margin-bottom:10px">Add text labels or arrows anywhere on the diagram. Coordinates match the plot axes.</div>
+      <div class="hint" style="margin-top:0;margin-bottom:12px">Add free-floating text labels or arrows anywhere on the diagram. Coordinates match the plot axes.</div>
       <div id="annoList"></div>
       <button class="btn btn-outline btn-sm" onclick="addAnnotation()" style="margin-top:8px">+ Add annotation</button>
 
-      <label style="margin-top:20px">Barrier markers (ΔE‡)</label>
-      <div class="hint" style="margin-top:0;margin-bottom:10px">Draw vertical ΔE‡ arrows between two steps on a pathway. Add as many as needed.</div>
+      <label style="margin-top:24px">Barrier markers</label>
+      <div class="hint" style="margin-top:0;margin-bottom:12px">Draw vertical energy difference arrows between two steps. Use X-Offset to manually nudge the line left or right (e.g. <code>0.2</code>).</div>
       <div id="barrierList"></div>
-      <div class="row" style="margin-top:8px">
+      <div class="row" style="margin-top:10px">
         <div><input id="barrierPath" value="Main" placeholder="Pathway"></div>
-        <div style="display:flex;gap:4px">
+        <div style="display:flex;gap:6px">
           <input id="barrierFrom" type="number" value="1" min="1" placeholder="From" title="From step">
           <input id="barrierTo" type="number" value="2" min="1" placeholder="To" title="To step">
         </div>
       </div>
-      <div class="row" style="margin-top:6px">
+      <div class="row" style="margin-top:10px">
         <div>
           <select id="barrierStyle">
-            <option value="dash">Dashed line</option>
-            <option value="solid">Solid line</option>
-            <option value="dot">Dotted line</option>
+            <option value="dash">Dashed</option>
+            <option value="solid">Solid</option>
+            <option value="dot">Dotted</option>
           </select>
         </div>
         <div>
-          <button class="btn btn-outline btn-sm" style="width:100%" onclick="addBarrierMarker()">+ Add barrier</button>
+          <select id="barrierLabelType" onchange="toggleBarrierCustom()">
+            <option value="ΔE^{‡}">ΔE‡</option>
+            <option value="ΔG^{‡}">ΔG‡</option>
+            <option value="ΔH^{‡}">ΔH‡</option>
+            <option value="E_{a}">Eₐ</option>
+            <option value="ΔE">ΔE</option>
+            <option value="ΔG">ΔG</option>
+            <option value="ΔH">ΔH</option>
+            <option value="custom">Custom text…</option>
+          </select>
         </div>
+      </div>
+      <div class="row3" style="margin-top:10px">
+        <div>
+          <input id="barrierCustomText" placeholder="Custom text..." disabled style="opacity:0.5; width:100%">
+        </div>
+        <div>
+          <select id="barrierTextSide" style="width:100%">
+            <option value="right">Right</option>
+            <option value="left">Left</option>
+          </select>
+        </div>
+        <div>
+          <input id="barrierOffsetX" type="number" step="0.1" value="0" placeholder="X-Offset" title="X-axis manual nudge (e.g., 0.2 or -0.2)" style="width:100%">
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <button class="btn btn-outline btn-sm" style="width:100%" onclick="addBarrierMarker()">+ Add barrier</button>
       </div>
 
       <div class="action-grid" style="margin-top:20px">
@@ -373,28 +423,25 @@ Alt-B, #166534</textarea>
     <!-- SCRIPT TAB -->
     <div class="tab-content" id="tab-script">
       <label>PES Runscript</label>
-      <div class="hint" style="margin-top:0;margin-bottom:10px">AMS-style text config that captures all settings, data, annotations, and barriers. Generate from current state, edit directly, or paste a saved script to restore.</div>
+      <div class="hint" style="margin-top:0;margin-bottom:12px">Text configuration that captures all settings, data, annotations, and barriers. Generate from current state, edit directly, or paste a saved script to restore.</div>
       <textarea id="scriptEditor" spellcheck="false" style="min-height:380px;font-family:var(--mono);font-size:11.5px;line-height:1.5;tab-size:2"></textarea>
-      <div class="action-grid" style="margin-top:10px">
+      <div class="action-grid" style="margin-top:12px">
         <button class="btn btn-primary" onclick="generateScript()">⤓ Generate script</button>
         <button class="btn btn-good" onclick="loadScript()">⤒ Load script</button>
         <button class="btn btn-outline" onclick="copyScript()">Copy to clipboard</button>
         <button class="btn btn-outline" onclick="clearScript()">Clear editor</button>
-      </div>
-      <div class="hint" style="margin-top:10px">
-        <b>Workflow:</b> Click "Generate script" to snapshot current state. Edit inline if needed. Click "Load script" to restore. You can also generate these blocks from Python post-processing and paste here directly.
       </div>
     </div>
 
     <!-- EXPORT TAB -->
     <div class="tab-content" id="tab-export">
       <label>Image export</label>
-      <div class="hint" style="margin-top:0;margin-bottom:10px">High-resolution exports at 2× scale. PDF uses landscape A4.</div>
+      <div class="hint" style="margin-top:0;margin-bottom:12px">High-resolution exports at 2× scale. PDF uses landscape A4 format.</div>
       <div class="row">
         <div><label>Width (px)</label><input id="exportW" type="number" value="1500"></div>
         <div><label>Height (px)</label><input id="exportH" type="number" value="950"></div>
       </div>
-      <div class="row" style="margin-top:6px">
+      <div class="row" style="margin-top:10px">
         <div><label>Scale factor</label><input id="exportScale" type="number" min="1" max="4" step="1" value="2"></div>
         <div><label>Background</label>
           <select id="exportBg"><option value="white">White</option><option value="transparent">Transparent</option></select>
@@ -408,11 +455,51 @@ Alt-B, #166534</textarea>
         <button class="btn btn-outline" onclick="downloadCSV()">CSV</button>
       </div>
 
-      <label style="margin-top:20px">Data management</label>
+      <label style="margin-top:24px">Data management</label>
       <div class="action-grid">
         <button class="btn btn-outline" onclick="copyData()">Copy data to clipboard</button>
         <button class="btn btn-danger" onclick="clearData()">Clear all</button>
       </div>
+    </div>
+
+    <!-- HELP TAB -->
+    <div class="tab-content help-section" id="tab-help">
+      <h3>Data Formatting</h3>
+      <p>Data must be entered as comma, tab, or semicolon separated values using the following column order:<br>
+      <code>Pathway, Step, Label, Energy, [Options]</code></p>
+      <ul>
+        <li><strong>Pathway:</strong> Name of the reaction path (e.g., <code>Main</code> or <code>Alt-A</code>). Points sharing the same pathway name will be connected by lines.</li>
+        <li><strong>Step:</strong> Integer representing the horizontal reaction coordinate (e.g., 1, 2, 3). Shared step numbers across different pathways will align vertically.</li>
+        <li><strong>Label:</strong> The text to display for the species.</li>
+        <li><strong>Energy:</strong> The numerical energy value (e.g., <code>32.4</code> or <code>-5.2</code>).</li>
+      </ul>
+
+      <h3>The 5th Column [Options]</h3>
+      <p>You can add an optional 5th column to precisely control how labels and numbers are displayed for individual points.</p>
+      <ul>
+        <li><code>#L</code> : Hides the text label.</li>
+        <li><code>#E</code> : Hides the numerical energy value.</li>
+        <li><strong>Number</strong> : Any bare number (e.g., <code>10</code> or <code>-5</code>) will vertically shift the label by that energy amount relative to the current position.</li>
+      </ul>
+      <div class="hint" style="margin-top:0">Example: <code>Main, 3, INT1, -5.20, #E 10</code><br>This hides the energy number and shifts the "INT1" label UP by 10 energy units.</div>
+
+      <h3 style="margin-top:24px">Subscripts & Superscripts</h3>
+      <p>You can easily format chemical formulas or transition state symbols in both the Data Tab and Custom Annotations Tab:</p>
+      <ul>
+        <li><strong>Subscripts:</strong> Wrap text in <code>_{...}</code>. Example: <code>H_{2}O</code> renders as H<sub>2</sub>O.</li>
+        <li><strong>Superscripts:</strong> Wrap text in <code>^{...}</code>. Example: <code>E^{‡}</code> renders as E<sup>‡</sup>.</li>
+      </ul>
+
+      <h3 style="margin-top:24px">Barriers & Annotations</h3>
+      <p><strong>Barrier Markers</strong> calculate the exact energy difference (Final minus Initial) between two steps on the same pathway. If you need to stop overlapping elements, use the <strong>X-Offset</strong> input to manually nudge the barrier left (e.g., <code>-0.2</code>) or right (e.g., <code>0.2</code>).</p>
+      <p><strong>Custom Annotations</strong> allow you to place free-floating text or arrows anywhere on the canvas using X and Y coordinates that map directly to the plot axes.</p>
+
+      <h3 style="margin-top:24px">Runscripts</h3>
+      <p>The <strong>Script</strong> tab generates a plain-text representation of your entire diagram—including data, visual styles, custom colors, annotations, and barriers. You can save this text file locally to easily reproduce or share your exact plot later.</p>
+    </div>
+
+    <div class="footer">
+      Vibe coded by <a href="https://www.linkedin.com/in/vijaystarvj/" target="_blank">Vijaya Raghavan KANNAN</a><br>❤️
     </div>
   </aside>
 
@@ -428,7 +515,6 @@ Alt-B, #166534</textarea>
 let lastParsed = [];
 let customAnnotations = [];
 let barrierMarkers = [];
-let undoStack = [];
 
 const palettes = {
   default: ['#1a1a1a','#b91c1c','#166534','#1d4ed8','#7e22ce','#c2410c','#0e7490','#a21caf','#525252'],
@@ -471,6 +557,12 @@ function toast(msg) {
 }
 
 /* ===== PARSING ===== */
+function escapeHTML(str) {
+  return String(str).replace(/[&<>'"]/g, tag => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+  }[tag]));
+}
+
 function splitLine(line) {
   if (line.includes(',')) return line.split(',');
   if (line.includes(';')) return line.split(';');
@@ -482,14 +574,33 @@ function parseData() {
   if (!text) return [];
   const rows = text.split(/\n+/).map(l => l.trim()).filter(l => l && !l.startsWith('#'));
   const data = [];
+  
   rows.forEach((line, i) => {
     const p = splitLine(line).map(s => s.trim());
     if (p.length >= 4) {
       const step = Number(p[1]), e = Number(p[3]);
-      if (Number.isFinite(step) && Number.isFinite(e))
-        data.push({ path: p[0], step, label: p[2], energyRaw: e, row: i + 1 });
+      
+      // Default 5th column options
+      let hideLabel = false;
+      let hideEnergy = false;
+      let shift = 0;
+
+      if (p.length >= 5 && p[4]) {
+        const opts = p[4].split(/\s+/);
+        opts.forEach(opt => {
+          const upperOpt = opt.toUpperCase();
+          if (upperOpt === '#L') hideLabel = true;
+          else if (upperOpt === '#E') hideEnergy = true;
+          else if (!isNaN(parseFloat(opt))) shift = parseFloat(opt);
+        });
+      }
+
+      if (Number.isFinite(step) && Number.isFinite(e)) {
+        data.push({ path: p[0], step, label: p[2], energyRaw: e, row: i + 1, hideLabel, hideEnergy, shift });
+      }
     }
   });
+  
   if (!data.length) return [];
   const minE = Math.min(...data.map(d => d.energyRaw));
   const mode = document.getElementById('energyMode').value;
@@ -506,9 +617,42 @@ function grouped(data) {
 function labelText(d) {
   const c = document.getElementById('labelChoice').value;
   if (c === 'none') return '';
-  if (c === 'name') return d.label;
-  if (c === 'energy') return d.energy.toFixed(2);
-  return `${d.label}<br>${d.energy.toFixed(2)}`;
+
+  // Determine visibility based on global dropdown AND row-specific flags
+  let showL = (c === 'all' || c === 'name') && !d.hideLabel;
+  let showE = (c === 'all' || c === 'energy') && !d.hideEnergy;
+
+  const safeLabel = texToHtml(escapeHTML(d.label));
+
+  if (showL && showE) return `${safeLabel}<br>${d.energy.toFixed(2)}`;
+  if (showL) return safeLabel;
+  if (showE) return d.energy.toFixed(2);
+  return '';
+}
+
+/* ===== SUB/SUPERSCRIPT ===== */
+// Converts _{...} → <sub>...</sub> and ^{...} → <sup>...</sup>
+// Works in labels, annotations, barrier text, titles
+function texToHtml(str) {
+  if (!str) return str;
+  return str
+    .replace(/\_\{([^}]*)\}/g, '<sub>$1</sub>')
+    .replace(/\^\{([^}]*)\}/g, '<sup>$1</sup>');
+}
+// Reverse: <sub>...</sub> → _{...} and <sup>...</sup> → ^{...}
+function htmlToTex(str) {
+  if (!str) return str;
+  return str
+    .replace(/<sub>([^<]*)<\/sub>/gi, '_{$1}')
+    .replace(/<sup>([^<]*)<\/sup>/gi, '^{$1}');
+}
+
+/* ===== BARRIER UI HELPERS ===== */
+function toggleBarrierCustom() {
+  const sel = document.getElementById('barrierLabelType').value;
+  const inp = document.getElementById('barrierCustomText');
+  if (sel === 'custom') { inp.disabled = false; inp.style.opacity = '1'; inp.focus(); }
+  else { inp.disabled = true; inp.style.opacity = '0.5'; inp.value = ''; }
 }
 
 /* ===== COLORS ===== */
@@ -596,7 +740,13 @@ function drawPlot() {
         const x = d.step + offset;
         traces.push({ x: [x - width / 2, x + width / 2], y: [d.energy, d.energy], mode: 'lines', type: 'scatter', line: { color, width: lt }, showlegend: false, hoverinfo: 'skip' });
         const txt = labelText(d);
-        if (txt) annotations.push({ x, y: d.energy, text: txt, showarrow: false, yshift: d.energy >= 0 ? 20 : -20, font: { color, size: fontSize, family: fontFamily }, align: 'center' });
+        if (txt) {
+          // Fixed shift logic: Use 5th column exact coordinate if provided, otherwise default to a strict 20px padding upward.
+          const yPos = d.shift !== 0 ? d.energy + d.shift : d.energy;
+          const pixShift = d.shift !== 0 ? 0 : 20; 
+          
+          annotations.push({ x, y: yPos, text: txt, showarrow: false, yshift: pixShift, font: { color, size: fontSize, family: fontFamily }, align: 'center' });
+        }
       });
       for (let i = 0; i < pts.length - 1; i++) {
         const a = pts[i], b = pts[i + 1];
@@ -611,7 +761,7 @@ function drawPlot() {
   // Custom annotations
   customAnnotations.forEach(a => {
     annotations.push({
-      x: a.x, y: a.y, text: a.text,
+      x: a.x, y: a.y, text: texToHtml(a.text),
       showarrow: a.arrow, arrowhead: 2, arrowsize: 1, arrowwidth: 1.5, arrowcolor: isDark ? '#aaa' : '#555',
       font: { size: a.size || 12, color: a.color || (isDark ? '#e4e4e7' : '#1a1a1a'), family: fontFamily },
       ax: a.ax || 0, ay: a.ay || -30
@@ -625,14 +775,32 @@ function drawPlot() {
     const from = grp[1].find(d => d.step === bm.from);
     const to = grp[1].find(d => d.step === bm.to);
     if (!from || !to) return;
-    const x = (from.step + to.step) / 2 + 0.55;
-    const diff = Math.abs(to.energy - from.energy).toFixed(1);
+    
+    // Apply optional manual X-Offset
+    const offsetX = bm.offsetX || 0;
+    const x = (from.step + to.step) / 2 + 0.55 + offsetX;
+    
+    // Calculate barrier as Final minus Initial (allows negative values)
+    const diff = (to.energy - from.energy).toFixed(1);
+    
     const bmDash = bm.style || 'dash';
-    traces.push({ x: [x, x], y: [from.energy, to.energy], mode: 'lines', type: 'scatter', line: { color: isDark ? '#888' : '#555', width: 1.2, dash: bmDash }, showlegend: false, hoverinfo: 'skip' });
-    // arrowheads at both ends
-    annotations.push({ x, y: to.energy, ax: 0, ay: to.energy > from.energy ? 10 : -10, text: '', showarrow: true, arrowhead: 3, arrowsize: 0.8, arrowwidth: 1.2, arrowcolor: isDark ? '#888' : '#555' });
-    annotations.push({ x, y: from.energy, ax: 0, ay: from.energy > to.energy ? 10 : -10, text: '', showarrow: true, arrowhead: 3, arrowsize: 0.8, arrowwidth: 1.2, arrowcolor: isDark ? '#888' : '#555' });
-    annotations.push({ x, y: (from.energy + to.energy) / 2, text: `ΔE‡ = ${diff}`, showarrow: false, xshift: 8, font: { size: fontSize, color: isDark ? '#ccc' : '#333', family: fontFamily } });
+    const lineColor = isDark ? '#888' : '#555';
+    // Build label text
+    let rawLabel = bm.labelType || 'ΔE^{‡}';
+    if (rawLabel === 'custom') rawLabel = bm.customText || '';
+    const labelHtml = texToHtml(rawLabel) + ' = ' + diff;
+    // Text side offset
+    const side = bm.textSide || 'right';
+    const xShift = side === 'left' ? -12 : 12;
+    const xAnchor = side === 'left' ? 'right' : 'left';
+
+    // Vertical line
+    traces.push({ x: [x, x], y: [from.energy, to.energy], mode: 'lines', type: 'scatter', line: { color: lineColor, width: 1.2, dash: bmDash }, showlegend: false, hoverinfo: 'skip' });
+    // Arrowheads
+    annotations.push({ x, y: to.energy, ax: 0, ay: to.energy > from.energy ? 10 : -10, text: '', showarrow: true, arrowhead: 3, arrowsize: 0.8, arrowwidth: 1.2, arrowcolor: lineColor });
+    annotations.push({ x, y: from.energy, ax: 0, ay: from.energy > to.energy ? 10 : -10, text: '', showarrow: true, arrowhead: 3, arrowsize: 0.8, arrowwidth: 1.2, arrowcolor: lineColor });
+    // Label
+    annotations.push({ x, y: (from.energy + to.energy) / 2, text: labelHtml, showarrow: false, xshift: xShift, xanchor: xAnchor, font: { size: fontSize, color: isDark ? '#ccc' : '#333', family: fontFamily } });
   });
 
   const allSteps = data.map(d => d.step);
@@ -640,17 +808,17 @@ function drawPlot() {
   const grid = document.getElementById('gridChoice').value;
   const showX = document.getElementById('xAxisChoice').value === 'show';
   const showZero = document.getElementById('zeroLineChoice').value === 'show';
-  const plotBg = isDark ? '#1c1c1f' : '#ffffff';
-  const paperBg = isDark ? '#1c1c1f' : '#ffffff';
+  const plotBg = isDark ? '#111827' : '#ffffff';
+  const paperBg = isDark ? '#111827' : '#ffffff';
   const gridColor = isDark
-    ? (grid === 'light' ? 'rgba(255,255,255,.06)' : 'rgba(255,255,255,.12)')
-    : (grid === 'light' ? 'rgba(0,0,0,.06)' : 'rgba(0,0,0,.14)');
-  const fontColor = isDark ? '#e4e4e7' : '#1a1a1a';
+    ? (grid === 'light' ? 'rgba(255,255,255,.04)' : 'rgba(255,255,255,.1)')
+    : (grid === 'light' ? 'rgba(0,0,0,.04)' : 'rgba(0,0,0,.1)');
+  const fontColor = isDark ? '#f9fafb' : '#111827';
   const legendCfg = getLegendConfig();
   const rightMargin = (legendCfg.show && document.getElementById('legendPosition')?.value === 'right') ? 120 : 35;
 
   const layout = {
-    title: { text: document.getElementById('plotTitle').value, font: { size: titleFontSize, family: fontFamily, color: fontColor } },
+    title: { text: texToHtml(document.getElementById('plotTitle').value), font: { size: titleFontSize, family: fontFamily, color: fontColor } },
     font: { family: fontFamily, color: fontColor },
     plot_bgcolor: plotBg, paper_bgcolor: paperBg,
     margin: { l: 80, r: rightMargin, t: 70, b: 70 },
@@ -658,7 +826,7 @@ function drawPlot() {
     legend: { orientation: legendCfg.orientation, x: legendCfg.x, xanchor: legendCfg.xanchor, y: legendCfg.y, yanchor: legendCfg.yanchor, font: { size: legendCfg.font?.size || 12, family: fontFamily }, bgcolor: legendCfg.bgcolor, bordercolor: legendCfg.bordercolor, borderwidth: legendCfg.borderwidth },
     annotations,
     xaxis: { title: showX ? { text: 'Reaction step', font: { size: axisFontSize } } : '', range: [minStep - 0.8, maxStep + 0.8], showticklabels: showX, showline: showX, zeroline: false, showgrid: grid === 'full', gridcolor: gridColor, dtick: 1, tickfont: { size: axisFontSize - 1 } },
-    yaxis: { title: { text: document.getElementById('yLabel').value, font: { size: axisFontSize } }, zeroline: showZero, zerolinewidth: 1.5, zerolinecolor: isDark ? 'rgba(255,255,255,.25)' : 'rgba(0,0,0,.35)', showgrid: grid !== 'off', gridcolor: gridColor, tickfont: { size: axisFontSize - 1 } }
+    yaxis: { title: { text: texToHtml(document.getElementById('yLabel').value), font: { size: axisFontSize } }, zeroline: showZero, zerolinewidth: 1.5, zerolinecolor: isDark ? 'rgba(255,255,255,.2)' : 'rgba(0,0,0,.25)', showgrid: grid !== 'off', gridcolor: gridColor, tickfont: { size: axisFontSize - 1 } }
   };
 
   Plotly.newPlot('plot', traces, layout, { responsive: true, displaylogo: false, modeBarButtonsToRemove: ['lasso2d', 'select2d'] });
@@ -682,7 +850,7 @@ function updateStats(data, groups) {
 
 function updateTable(data) {
   document.getElementById('tableWrap').style.display = 'block';
-  document.getElementById('pointTable').innerHTML = '<thead><tr><th>Path</th><th>Step</th><th>Label</th><th>Energy</th></tr></thead><tbody>' + data.map(d => `<tr><td>${d.path}</td><td>${d.step}</td><td>${d.label}</td><td>${d.energy.toFixed(3)}</td></tr>`).join('') + '</tbody>';
+  document.getElementById('pointTable').innerHTML = '<thead><tr><th>Path</th><th>Step</th><th>Label</th><th>Energy</th></tr></thead><tbody>' + data.map(d => `<tr><td>${escapeHTML(d.path)}</td><td>${d.step}</td><td>${escapeHTML(d.label)}</td><td>${d.energy.toFixed(3)}</td></tr>`).join('') + '</tbody>';
 }
 
 /* ===== ANNOTATIONS ===== */
@@ -713,8 +881,21 @@ function addBarrierMarker() {
   const to = +document.getElementById('barrierTo').value;
   const path = document.getElementById('barrierPath').value.trim();
   const style = document.getElementById('barrierStyle')?.value || 'dash';
+  const labelType = document.getElementById('barrierLabelType')?.value || 'ΔE^{‡}';
+  const customText = document.getElementById('barrierCustomText')?.value || '';
+  const textSide = document.getElementById('barrierTextSide')?.value || 'right';
+  const offsetX = parseFloat(document.getElementById('barrierOffsetX')?.value) || 0;
+  
   if (path && Number.isFinite(from) && Number.isFinite(to)) {
-    barrierMarkers.push({ from, to, path, style });
+    // Validation check to prevent phantom barriers
+    const pathData = lastParsed.filter(d => d.path === path);
+    if (!pathData.length) { toast(`Error: Pathway '${path}' not found`); return; }
+    
+    const hasFrom = pathData.some(d => d.step === from);
+    const hasTo = pathData.some(d => d.step === to);
+    if (!hasFrom || !hasTo) { toast(`Error: Steps ${from} and ${to} must exist in pathway`); return; }
+
+    barrierMarkers.push({ from, to, path, style, labelType, customText, textSide, offsetX });
     renderBarrierList();
     toast(`Barrier: ${path} step ${from} → ${to}`);
   }
@@ -727,16 +908,27 @@ function removeBarrier(i) {
 
 function renderBarrierList() {
   const el = document.getElementById('barrierList');
-  if (!barrierMarkers.length) { el.innerHTML = '<div style="font-size:11px;color:var(--text3);padding:4px 0">No barriers added yet.</div>'; return; }
-  el.innerHTML = barrierMarkers.map((bm, i) => `
+  if (!barrierMarkers.length) { 
+    el.innerHTML = '<div style="font-size:11px;color:var(--text3);padding:4px 0">No barriers added yet.</div>'; 
+    return; 
+  }
+  
+  el.innerHTML = barrierMarkers.map((bm, i) => {
+    const displayLabel = bm.labelType === 'custom' ? (bm.customText || 'custom') : bm.labelType;
+    const displayLabelHtml = texToHtml(escapeHTML(displayLabel));
+    const safePath = escapeHTML(bm.path);
+    const offsetText = bm.offsetX ? ` <span style="color:var(--text3)">[dx:${bm.offsetX}]</span>` : '';
+    
+    return `
     <div class="anno-item">
-      <span style="font-size:11px;font-family:var(--mono);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${bm.path}: step ${bm.from} → ${bm.to}">
-        <b>${bm.path}</b> &nbsp;${bm.from} → ${bm.to} &nbsp;<span style="color:var(--text3)">(${bm.style})</span>
+      <span style="font-size:11px;font-family:var(--mono);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${safePath}: step ${bm.from} → ${bm.to} | ${escapeHTML(displayLabel)} (${bm.textSide})">
+        <b>${safePath}</b> ${bm.from}→${bm.to} &nbsp;${displayLabelHtml} <span style="color:var(--text3)">${bm.textSide} ${bm.style}</span>${offsetText}
       </span>
       <button class="btn btn-danger btn-sm" onclick="removeBarrier(${i})">✕</button>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
+
 renderBarrierList();
 
 /* ===== PRESETS ===== */
@@ -749,7 +941,7 @@ SN2, 3, Products, -8.20`,
   multi: `# Multi-path PES
 Main, 1, R, 0.00
 Main, 2, TS1, 32.40
-Main, 3, INT1, -5.20
+Main, 3, INT1, -5.20, #E 10
 Main, 4, TS2, 41.70
 Main, 5, P, -12.30
 
@@ -868,7 +1060,7 @@ function clearData() {
 function generateScript() {
   const g = id => document.getElementById(id)?.value || '';
   const lines = [];
-  lines.push('PESArchitect Input');
+  lines.push('PESMaker Input');
   lines.push('');
 
   // Data block
@@ -937,8 +1129,10 @@ function generateScript() {
   // Barriers block
   if (barrierMarkers.length) {
     lines.push('  Barriers');
+    lines.push('    # pathway, from, to, lineStyle, labelType, textSide, offsetX');
     barrierMarkers.forEach(bm => {
-      lines.push(`    ${bm.path}, ${bm.from}, ${bm.to}, ${bm.style || 'dash'}`);
+      const label = bm.labelType === 'custom' ? `"${bm.customText || ''}"` : bm.labelType;
+      lines.push(`    ${bm.path}, ${bm.from}, ${bm.to}, ${bm.style || 'dash'}, ${label}, ${bm.textSide || 'right'}, ${bm.offsetX || 0}`);
     });
     lines.push('  End');
     lines.push('');
@@ -954,8 +1148,10 @@ function loadScript() {
   const text = document.getElementById('scriptEditor').value.trim();
   if (!text) { toast('Script editor is empty'); return; }
 
-  // Check wrapper
-  if (!text.startsWith('PESArchitect Input')) { toast('Invalid script: must start with "PESArchitect Input"'); return; }
+  // Check wrapper (accepts both new and old format)
+  if (!text.startsWith('PESMaker Input') && !text.startsWith('PESArchitect Input')) { 
+    toast('Invalid script: must start with "PESMaker Input"'); return; 
+  }
 
   // Extract blocks
   function extractBlock(name) {
@@ -1047,14 +1243,34 @@ function loadScript() {
   barrierMarkers = [];
   barrierLines.forEach(line => {
     const t = line.trim();
-    if (!t) return;
+    if (!t || t.startsWith('#')) return;
+    // Handle quoted custom text: pathway, from, to, style, "custom text", side, offsetX
+    const quotedMatch = t.match(/^([^,]+),\s*(\d+),\s*(\d+),\s*(\w+),\s*"([^"]*)",\s*(\w+)(?:,\s*(-?[\d.]+))?/);
+    if (quotedMatch) {
+      barrierMarkers.push({
+        path: quotedMatch[1].trim(),
+        from: +quotedMatch[2],
+        to: +quotedMatch[3],
+        style: quotedMatch[4],
+        labelType: 'custom',
+        customText: quotedMatch[5],
+        textSide: quotedMatch[6],
+        offsetX: parseFloat(quotedMatch[7]) || 0
+      });
+      return;
+    }
+    // Non-quoted: pathway, from, to, style, labelType, side, offsetX
     const parts = t.split(/[,;\t]+/).map(s => s.trim());
     if (parts.length >= 3) {
       barrierMarkers.push({
         path: parts[0],
         from: +parts[1],
         to: +parts[2],
-        style: parts[3] || 'dash'
+        style: parts[3] || 'dash',
+        labelType: parts[4] || 'ΔE^{‡}',
+        customText: '',
+        textSide: parts[5] || 'right',
+        offsetX: parseFloat(parts[6]) || 0
       });
     }
   });
